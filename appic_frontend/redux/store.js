@@ -30,4 +30,3 @@ export const store = configureStore({
 });
 
 export const getState = store.getState;
-

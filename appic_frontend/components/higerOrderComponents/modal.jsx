@@ -1,6 +1,5 @@
 'use client';
 import darkModeClassnamegenerator from '@/utils/darkClassGenerator';
-import { useSelector } from 'react-redux';
 
 function Modal({ children, active }) {
   return (
@@ -13,4 +12,3 @@ function Modal({ children, active }) {
 }
 
 export default Modal;
-

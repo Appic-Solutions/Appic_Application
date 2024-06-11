@@ -142,4 +142,3 @@ function WalletTokens({ setEditMode }) {
 }
 
 export default WalletTokens;
-
