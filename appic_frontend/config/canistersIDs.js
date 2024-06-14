@@ -6,5 +6,6 @@ export default {
   WICP: 'utozz-siaaa-aaaam-qaaxq-cai',
   XTC: 'aanaa-xaaaa-aaaah-aaeiq-cai',
   APPIC_ROOT: 'vd7yn-iqaaa-aaaak-qdbxq-cai',
+  APPIC_MULTISWAP: 'iyi4m-kqaaa-aaaan-qmmqq-cai',
 };
 

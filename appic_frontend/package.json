@@ -10,6 +10,8 @@
   },
   "dependencies": {
     "@dfinity/agent": "^1.1.1",
+    "@dfinity/ledger-icp": "^2.3.1",
+    "@dfinity/nns": "^5.1.2",
     "@reduxjs/toolkit": "^2.2.2",
     "axios": "^1.6.8",
     "bignumber.js": "^9.1.2",

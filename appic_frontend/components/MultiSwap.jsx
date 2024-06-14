@@ -6,6 +6,13 @@ import { useState } from 'react';
 import MultiSwapTable from './MultiSwapTable';
 import Modal from './higerOrderComponents/modal';
 import darkModeClassnamegenerator, { darkClassGenerator } from '@/utils/darkClassGenerator';
+import BigNumber from 'bignumber.js';
+import { BatchTransact } from '@/artemis-web3-adapter';
+import { AppicMultiswapidlFactory, icrcIdlFactory, dip20IdleFactory } from '@/did';
+import canistersIDs from '@/config/canistersIDs';
+import { artemisWalletAdapter } from '@/utils/walletConnector';
+import { Principal } from '@dfinity/principal';
+import { AccountIdentifier, SubAccount } from '@dfinity/ledger-icp';
 function MultiSwap() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [modalSearchValue, setModalSearchValue] = useState('');
@@ -44,8 +51,106 @@ function MultiSwap() {
     setSwapTokens(newSwapTokens);
   };
 
-  const handleConfirmSwap = () => {
+  const handleConfirmSwap = async () => {
     console.log('Swap Confirmed Successfully!');
+
+    let sellTokens = [];
+    let buyTokens = [];
+
+    swapTokens.forEach((token) => {
+      let newPercentage = parseFloat(token.newPercentage);
+      if (token.percentage - newPercentage > 0) {
+        // Calculate amtSell
+        let balance = new BigNumber(token.balance || 0);
+        let percentageDiff = new BigNumber(token.percentage).minus(newPercentage);
+        let amtSell = percentageDiff.times(balance).div(100).toFixed(0); // No decimals
+
+        // Add amtSell property
+        token.amtSell = amtSell;
+
+        sellTokens.push(token);
+      } else if (token.percentage - newPercentage < 0) {
+        buyTokens.push(token);
+      }
+    });
+    let sellTokenIds = sellTokens.map((token) => token.id);
+    buyTokens = buyTokens.filter((token) => !sellTokenIds.includes(token.id));
+
+    console.log('Selling Tokens', sellTokens);
+    console.log('Buying Tokens', buyTokens);
+
+    try {
+      let AppicActor = await artemisWalletAdapter.getCanisterActor(canistersIDs.APPIC_MULTISWAP, AppicMultiswapidlFactory, false);
+      const subAccount = await AppicActor.getSubAccount();
+
+      let transactions = {};
+
+      for (let i = 0; i < sellTokens.length; i++) {
+        if (sellTokens[i].tokenType === 'ICRC1') {
+          // transactions[sellTokens[i].id] = {
+          //   canisterId: Principal.fromText(sellTokens[i].id),
+          //   idl: icrcIdlFactory,
+          //   methodName: 'icrc1_transfer',
+          //   args: [
+          // {
+          //   to: { owner: Principal.fromText(canistersIDs.APPIC_MULTISWAP), subaccount: Array.from(subAccount) },
+          //   fee: [],
+          //   memo: [],
+          //   from_subaccount: [],
+          //   created_at_time: [],
+          //   amount: BigNumber(sellTokens[i].amtSell).toNumber(),
+          // },
+          //   ],
+          // };
+
+          console.log('---------', subAccount);
+          let icrc1 = await artemisWalletAdapter.getCanisterActor(sellTokens[i].id, icrcIdlFactory, false);
+          const tx = await icrc1.icrc1_transfer({
+            to: {
+              owner: Principal.fromText(canistersIDs.APPIC_MULTISWAP),
+              subaccount: subAccount,
+            },
+            fee: [],
+            memo: [],
+            from_subaccount: [],
+            created_at_time: [],
+            amount: BigNumber(sellTokens[i].amtSell).toNumber(),
+          });
+        } else if (sellTokens[i].tokenType === 'ICRC2') {
+          transactions[sellTokens[i].id] = {
+            canisterId: Principal.fromText(sellTokens[i].id),
+            idl: icrcIdlFactory,
+            methodName: 'icrc2_approve',
+            args: [
+              {
+                fee: [],
+                memo: [],
+                from_subaccount: [],
+                created_at_time: [],
+                expected_allowance: [],
+                expires_at: [],
+                amount: BigNumber(sellTokens[i].amtSell).toNumber(),
+                spender: { owner: Principal.fromText(canistersIDs.APPIC_MULTISWAP), subaccount: [] },
+              },
+            ],
+          };
+        } else if (sellTokens[i].tokenType === 'YC' || sellTokens[i].tokenType === 'DIP20') {
+          transactions[sellTokens[i].id] = {
+            canisterId: Principal.fromText(sellTokens[i].id),
+            idl: dip20IdleFactory,
+            methodName: 'approve',
+            args: [Principal.fromText(canistersIDs.APPIC_MULTISWAP), BigNumber(sellTokens[i].amtSell).toNumber()],
+          };
+        }
+      }
+      console.log(transactions);
+      // Execute transaction for calling approve function
+      let transactionsList = new BatchTransact(transactions, artemisWalletAdapter);
+      console.log(transactionsList);
+      await transactionsList.execute();
+    } catch (error) {
+      console.log(error.message);
+    }
   };
 
   const calcTotalAndLeft = () => {
@@ -91,7 +196,7 @@ function MultiSwap() {
     <div className={darkModeClassnamegenerator('multi-swap')}>
       {loader && <LoadingComponent></LoadingComponent>}
       <MultiSwapTable swapTokens={swapTokens} onUpdate={handleTokenUpdate} />
-      {totall > 100 ? <p className="warning-message">Totall percentage should NOT exceed 100%</p> : null}
+      {totall > 100 ? <p className="warning-message">Total percentage should NOT exceed 100%</p> : null}
       <div className="cta-container">
         <button className="btn btn-add" onClick={() => setIsModalOpen(true)}>
           <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" style={{ width: 24 }}>
@@ -185,3 +290,4 @@ function MultiSwap() {
 }
 
 export default MultiSwap;
+
