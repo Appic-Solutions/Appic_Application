@@ -188,7 +188,28 @@ function MultiSwap() {
       })
       .filter((toAddToken) => ownedTokens.some((ownedToken) => toAddToken.id !== ownedToken.id));
 
-    setSwapTokens([...toAddTokens, ...ownedTokensWithAddedProperties]);
+    let arr = [...toAddTokens, ...ownedTokensWithAddedProperties];
+    // Create a new array to store filtered objects
+    let filteredArr = [];
+    // Create an object to keep track of seen IDs
+    let seenIds = {};
+
+    // Iterate through the original array
+    for (let obj of arr) {
+      // If the ID has not been seen before
+      if (!seenIds[obj.id]) {
+        // Mark the ID as seen
+        seenIds[obj.id] = true;
+        // Add the object to the filtered array
+        filteredArr.push(obj);
+      } else if (seenIds[obj.id] && obj.newPercentage !== 0) {
+        // If the ID has been seen before and the current object's newPercentage is not zero
+        // Replace the previous object with the current object in the filtered array
+        filteredArr = filteredArr.filter((o) => o.id !== obj.id);
+        filteredArr.push(obj);
+      }
+    }
+    setSwapTokens(filteredArr);
     setIsModalOpen(false);
   };
 
