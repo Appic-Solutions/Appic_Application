@@ -26,6 +26,8 @@ function MultiSwap() {
     return { ...ownedToken, percentage, value: ownedToken.usdBalance, newValue: ownedToken.usdBalance, newPercentage: percentage };
   });
 
+  const principalID = useSelector((state) => state.wallet.items.principalID);
+
   const [swapTokens, setSwapTokens] = useState(ownedTokensWithAddedProperties);
 
   const [checkedTokens, setCheckedTokens] = useState(() => swapTokens.map((swapToken) => swapToken.id));
@@ -53,9 +55,20 @@ function MultiSwap() {
 
   const handleConfirmSwap = async () => {
     console.log('Swap Confirmed Successfully!');
+    console.log('_____________________________', typeof principalID);
 
-    let sellTokens = [];
-    let buyTokens = [];
+    let sellTokenssDetails = [];
+    let buyTokensDetails = [];
+
+    let sellingTokens = []; // List of tokens being sold
+    let buyingTokens = []; // List of tokens being bought
+    let sellAmounts = []; // Amounts of tokens being sold
+    let buyAmounts = []; // Amounts of tokens being bought
+    let midToken = Principal.fromText(canistersIDs.NNS_ICP_LEDGER); // The middle token used for swaps
+    let midTokenType = 'ICRC2'; // Type of the middle token
+    let sellingTokensType = []; // Types of the selling tokens
+    let buyingTokensType = []; // Types of the buying tokens
+    let caller = Principal.fromText(principalID); // Principal of the user initiating the swap
 
     swapTokens.forEach((token) => {
       let newPercentage = parseFloat(token.newPercentage);
@@ -64,61 +77,62 @@ function MultiSwap() {
         let balance = new BigNumber(token.balance || 0);
         let percentageDiff = new BigNumber(token.percentage).minus(newPercentage);
         let amtSell = percentageDiff.times(balance).div(100).toFixed(0); // No decimals
-
-        // Add amtSell property
         token.amtSell = amtSell;
-
-        sellTokens.push(token);
+        sellTokenssDetails.push(token);
       } else if (token.percentage - newPercentage < 0) {
-        buyTokens.push(token);
+        buyTokensDetails.push(token);
       }
     });
-    let sellTokenIds = sellTokens.map((token) => token.id);
-    buyTokens = buyTokens.filter((token) => !sellTokenIds.includes(token.id));
+    let sellTokenIds = sellTokenssDetails.map((token) => token.id);
+    buyTokensDetails = buyTokensDetails.filter((token) => !sellTokenIds.includes(token.id));
 
-    console.log('Selling Tokens', sellTokens);
-    console.log('Buying Tokens', buyTokens);
+    let totalBuyPer = 0;
+    buyTokensDetails.forEach((token) => {
+      totalBuyPer = Number(totalBuyPer.toString()) + Number(token.newPercentage.toString());
+    });
 
+    sellingTokens = sellTokenssDetails.map((token) => Principal.fromText(token.id));
+    buyingTokens = buyTokensDetails.map((token) => Principal.fromText(token.id));
+    sellAmounts = sellTokenssDetails.map((token) => new BigNumber(token.amtSell).toNumber());
+    sellingTokensType = sellTokenssDetails.map((token) => token.tokenType);
+    buyingTokensType = buyTokensDetails.map((token) => token.tokenType);
+    buyTokensDetails.forEach((token) => {
+      let a = new BigNumber(token.newPercentage).times(100).div(totalBuyPer).toFixed();
+      buyAmounts.push(new BigNumber(a).toNumber());
+    });
+
+    console.log('Selling Tokens:', sellingTokens);
+    console.log('Buying Tokens:', buyingTokens);
+    console.log('Sell Amounts:', sellAmounts);
+    console.log('Buy Amounts:', buyAmounts);
+    console.log('Mid Token:', midToken);
+    console.log('Mid Token Type:', midTokenType);
+    console.log('Selling Tokens Type:', sellingTokensType);
+    console.log('Buying Tokens Type:', buyingTokensType);
+    console.log('Caller:', caller);
     try {
       let AppicActor = await artemisWalletAdapter.getCanisterActor(canistersIDs.APPIC_MULTISWAP, AppicMultiswapidlFactory, false);
       const subAccount = await AppicActor.getSubAccount();
 
       let transactions = {};
 
-      for (let i = 0; i < sellTokens.length; i++) {
-        if (sellTokens[i].tokenType === 'ICRC1') {
-          // transactions[sellTokens[i].id] = {
-          //   canisterId: Principal.fromText(sellTokens[i].id),
-          //   idl: icrcIdlFactory,
-          //   methodName: 'icrc1_transfer',
-          //   args: [
-          // {
-          //   to: { owner: Principal.fromText(canistersIDs.APPIC_MULTISWAP), subaccount: Array.from(subAccount) },
-          //   fee: [],
-          //   memo: [],
-          //   from_subaccount: [],
-          //   created_at_time: [],
-          //   amount: BigNumber(sellTokens[i].amtSell).toNumber(),
-          // },
-          //   ],
-          // };
-
-          console.log('---------', subAccount);
-          let icrc1 = await artemisWalletAdapter.getCanisterActor(sellTokens[i].id, icrcIdlFactory, false);
+      for (let i = 0; i < sellTokenssDetails.length; i++) {
+        if (sellTokenssDetails[i].tokenType === 'ICRC1') {
+          let icrc1 = await artemisWalletAdapter.getCanisterActor(sellTokenssDetails[i].id, icrcIdlFactory, false);
           const tx = await icrc1.icrc1_transfer({
             to: {
               owner: Principal.fromText(canistersIDs.APPIC_MULTISWAP),
-              subaccount: subAccount,
+              subaccount: [subAccount],
             },
             fee: [],
             memo: [],
             from_subaccount: [],
             created_at_time: [],
-            amount: BigNumber(sellTokens[i].amtSell).toNumber(),
+            amount: BigNumber(sellTokenssDetails[i].amtSell).toNumber(),
           });
-        } else if (sellTokens[i].tokenType === 'ICRC2') {
-          transactions[sellTokens[i].id] = {
-            canisterId: Principal.fromText(sellTokens[i].id),
+        } else if (sellTokenssDetails[i].tokenType === 'ICRC2') {
+          transactions[sellTokenssDetails[i].id] = {
+            canisterId: Principal.fromText(sellTokenssDetails[i].id),
             idl: icrcIdlFactory,
             methodName: 'icrc2_approve',
             args: [
@@ -129,25 +143,35 @@ function MultiSwap() {
                 created_at_time: [],
                 expected_allowance: [],
                 expires_at: [],
-                amount: BigNumber(sellTokens[i].amtSell).toNumber(),
+                amount: BigNumber(sellTokenssDetails[i].amtSell).toNumber(),
                 spender: { owner: Principal.fromText(canistersIDs.APPIC_MULTISWAP), subaccount: [] },
               },
             ],
           };
-        } else if (sellTokens[i].tokenType === 'YC' || sellTokens[i].tokenType === 'DIP20') {
-          transactions[sellTokens[i].id] = {
-            canisterId: Principal.fromText(sellTokens[i].id),
+        } else if (sellTokenssDetails[i].tokenType === 'YC' || sellTokenssDetails[i].tokenType === 'DIP20') {
+          transactions[sellTokenssDetails[i].id] = {
+            canisterId: Principal.fromText(sellTokenssDetails[i].id),
             idl: dip20IdleFactory,
             methodName: 'approve',
-            args: [Principal.fromText(canistersIDs.APPIC_MULTISWAP), BigNumber(sellTokens[i].amtSell).toNumber()],
+            args: [Principal.fromText(canistersIDs.APPIC_MULTISWAP), BigNumber(sellTokenssDetails[i].amtSell).toNumber()],
           };
         }
       }
-      console.log(transactions);
-      // Execute transaction for calling approve function
       let transactionsList = new BatchTransact(transactions, artemisWalletAdapter);
       console.log(transactionsList);
       await transactionsList.execute();
+
+      let sendMultiTras = await AppicActor.multiswap({
+        sellingTokens: sellingTokens, // List of tokens being sold
+        buyingTokens: buyingTokens, // List of tokens being bought
+        sellAmounts: sellAmounts, // Amounts of tokens being sold
+        buyAmounts: buyAmounts, // Amounts of tokens being bought
+        midToken: midToken, // The middle token used for swaps
+        midTokenType: midTokenType, // Type of the middle token
+        sellingTokensType: sellingTokensType, // Types of the selling tokens
+        buyingTokensType: buyingTokensType, // Types of the buying tokens
+        caller: caller, // Principal of the user initiating the swap
+      });
     } catch (error) {
       console.log(error.message);
     }
