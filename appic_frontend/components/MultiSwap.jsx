@@ -55,7 +55,6 @@ function MultiSwap() {
 
   const handleConfirmSwap = async () => {
     console.log('Swap Confirmed Successfully!');
-    console.log('_____________________________', typeof principalID);
 
     let sellTokenssDetails = [];
     let buyTokensDetails = [];
@@ -72,33 +71,36 @@ function MultiSwap() {
 
     swapTokens.forEach((token) => {
       let newPercentage = parseFloat(token.newPercentage);
-      if (token.percentage - newPercentage > 0) {
+      if (Math.trunc(parseFloat(token.percentage) - newPercentage) > 0) {
         // Calculate amtSell
         let balance = new BigNumber(token.balance || 0);
         let percentageDiff = new BigNumber(token.percentage).minus(newPercentage);
         let amtSell = percentageDiff.times(balance).div(100).toFixed(0); // No decimals
         token.amtSell = amtSell;
         sellTokenssDetails.push(token);
-      } else if (token.percentage - newPercentage < 0) {
+      } else if (Math.trunc(parseFloat(token.percentage) - newPercentage) < 0) {
+        console.log(token.percentage - newPercentage);
         buyTokensDetails.push(token);
       }
     });
     let sellTokenIds = sellTokenssDetails.map((token) => token.id);
-    buyTokensDetails = buyTokensDetails.filter((token) => !sellTokenIds.includes(token.id));
+    sellingTokens = sellTokenssDetails.map((token) => Principal.fromText(token.id));
+    sellAmounts = sellTokenssDetails.map((token) => new BigNumber(token.amtSell).toNumber());
+    sellingTokensType = sellTokenssDetails.map((token) => String(token.tokenType));
 
+    buyTokensDetails = buyTokensDetails.filter((token) => !sellTokenIds.includes(token.id));
     let totalBuyPer = 0;
     buyTokensDetails.forEach((token) => {
-      totalBuyPer = Number(totalBuyPer.toString()) + Number(token.newPercentage.toString());
+      totalBuyPer = totalBuyPer + Number(token.newPercentage) - Number(token.percentage);
     });
 
-    sellingTokens = sellTokenssDetails.map((token) => Principal.fromText(token.id));
-    buyingTokens = buyTokensDetails.map((token) => Principal.fromText(token.id));
-    sellAmounts = sellTokenssDetails.map((token) => new BigNumber(token.amtSell).toNumber());
-    sellingTokensType = sellTokenssDetails.map((token) => token.tokenType);
-    buyingTokensType = buyTokensDetails.map((token) => token.tokenType);
     buyTokensDetails.forEach((token) => {
-      let a = new BigNumber(token.newPercentage).times(100).div(totalBuyPer).toFixed();
-      buyAmounts.push(new BigNumber(a).toNumber());
+      let a = new BigNumber(token.newPercentage).times(100).div(totalBuyPer).toFixed(0);
+      if (new BigNumber(a).toNumber() !== 0) {
+        buyAmounts.push(new BigNumber(a).toNumber());
+        buyingTokens.push(Principal.fromText(token.id));
+        buyingTokensType.push(String(token.tokenType));
+      }
     });
 
     console.log('Selling Tokens:', sellingTokens);
@@ -158,7 +160,6 @@ function MultiSwap() {
         }
       }
       let transactionsList = new BatchTransact(transactions, artemisWalletAdapter);
-      console.log(transactionsList);
       await transactionsList.execute();
 
       let sendMultiTras = await AppicActor.multiswap({
@@ -173,7 +174,7 @@ function MultiSwap() {
         caller: caller, // Principal of the user initiating the swap
       });
     } catch (error) {
-      console.log(error.message);
+      console.log(error);
     }
   };
 
@@ -224,12 +225,14 @@ function MultiSwap() {
       if (!seenIds[obj.id]) {
         // Mark the ID as seen
         seenIds[obj.id] = true;
+        obj.newPercentage = Math.round(obj.newPercentage);
         // Add the object to the filtered array
         filteredArr.push(obj);
       } else if (seenIds[obj.id] && obj.newPercentage !== 0) {
         // If the ID has been seen before and the current object's newPercentage is not zero
         // Replace the previous object with the current object in the filtered array
         filteredArr = filteredArr.filter((o) => o.id !== obj.id);
+        obj.newPercentage = Math.round(obj.newPercentage);
         filteredArr.push(obj);
       }
     }
