@@ -23,7 +23,13 @@ function MultiSwap() {
   const ownedTokens = useSelector((state) => state.wallet.items.assets);
   const ownedTokensWithAddedProperties = ownedTokens.map((ownedToken) => {
     const percentage = (ownedToken.usdBalance / totalBalance) * 100;
-    return { ...ownedToken, percentage, value: ownedToken.usdBalance, newValue: ownedToken.usdBalance, newPercentage: percentage };
+    return {
+      ...ownedToken,
+      percentage: Math.round(percentage),
+      value: ownedToken.usdBalance,
+      newValue: ownedToken.usdBalance,
+      newPercentage: Math.round(percentage),
+    };
   });
 
   const principalID = useSelector((state) => state.wallet.items.principalID);
@@ -54,8 +60,6 @@ function MultiSwap() {
   };
 
   const handleConfirmSwap = async () => {
-    console.log('Swap Confirmed Successfully!');
-
     let sellTokenssDetails = [];
     let buyTokensDetails = [];
 
@@ -73,19 +77,19 @@ function MultiSwap() {
       let newPercentage = parseFloat(token.newPercentage);
       if (Math.trunc(parseFloat(token.percentage) - newPercentage) > 0) {
         // Calculate amtSell
-        let balance = new BigNumber(token.balance || 0);
+        let balance = new BigNumber(token.balance);
         let percentageDiff = new BigNumber(token.percentage).minus(newPercentage);
-        let amtSell = percentageDiff.times(balance).div(100).toFixed(0); // No decimals
+        let amtSell = Number(percentageDiff.times(balance).div(token.percentage).toFixed(0)); // No decimals
+        amtSell = Number(new BigNumber(amtSell).minus(token.fee).toFixed(0));
         token.amtSell = amtSell;
         sellTokenssDetails.push(token);
       } else if (Math.trunc(parseFloat(token.percentage) - newPercentage) < 0) {
-        console.log(token.percentage - newPercentage);
         buyTokensDetails.push(token);
       }
     });
     let sellTokenIds = sellTokenssDetails.map((token) => token.id);
     sellingTokens = sellTokenssDetails.map((token) => Principal.fromText(token.id));
-    sellAmounts = sellTokenssDetails.map((token) => new BigNumber(token.amtSell).toNumber());
+    sellAmounts = sellTokenssDetails.map((token) => token.amtSell);
     sellingTokensType = sellTokenssDetails.map((token) => String(token.tokenType));
 
     buyTokensDetails = buyTokensDetails.filter((token) => !sellTokenIds.includes(token.id));
@@ -95,7 +99,7 @@ function MultiSwap() {
     });
 
     buyTokensDetails.forEach((token) => {
-      let a = new BigNumber(token.newPercentage).times(100).div(totalBuyPer).toFixed(0);
+      let a = new BigNumber(token.newPercentage).minus(token.percentage).times(100).div(totalBuyPer).toFixed(0);
       if (new BigNumber(a).toNumber() !== 0) {
         buyAmounts.push(new BigNumber(a).toNumber());
         buyingTokens.push(Principal.fromText(token.id));
@@ -111,13 +115,11 @@ function MultiSwap() {
     console.log('Mid Token Type:', midTokenType);
     console.log('Selling Tokens Type:', sellingTokensType);
     console.log('Buying Tokens Type:', buyingTokensType);
-    console.log('Caller:', caller);
     try {
-      let AppicActor = await artemisWalletAdapter.getCanisterActor(canistersIDs.APPIC_MULTISWAP, AppicMultiswapidlFactory, false);
-      const subAccount = await AppicActor.getSubAccount();
-
+      let AppicActor = await artemisWalletAdapter.getCanisterActor(canistersIDs.APPIC_MULTISWAP, AppicMultiswapidlFactory, true);
+      const subAccount = await AppicActor.getICRC1SubAccount(caller);
+      console.log('subAccount', subAccount);
       let transactions = {};
-
       for (let i = 0; i < sellTokenssDetails.length; i++) {
         if (sellTokenssDetails[i].tokenType === 'ICRC1') {
           let icrc1 = await artemisWalletAdapter.getCanisterActor(sellTokenssDetails[i].id, icrcIdlFactory, false);
@@ -161,18 +163,31 @@ function MultiSwap() {
       }
       let transactionsList = new BatchTransact(transactions, artemisWalletAdapter);
       await transactionsList.execute();
+      console.log('----------------------');
 
-      let sendMultiTras = await AppicActor.multiswap({
-        sellingTokens: sellingTokens, // List of tokens being sold
-        buyingTokens: buyingTokens, // List of tokens being bought
-        sellAmounts: sellAmounts, // Amounts of tokens being sold
-        buyAmounts: buyAmounts, // Amounts of tokens being bought
-        midToken: midToken, // The middle token used for swaps
-        midTokenType: midTokenType, // Type of the middle token
-        sellingTokensType: sellingTokensType, // Types of the selling tokens
-        buyingTokensType: buyingTokensType, // Types of the buying tokens
-        caller: caller, // Principal of the user initiating the swap
-      });
+      // let sendMultiTras = await AppicActor.multiswap(
+      //   sellingTokens, // List of tokens being sold
+      //   buyingTokens, // List of tokens being bought
+      //   sellAmounts, // Amounts of tokens being sold
+      //   buyAmounts, // Amounts of tokens being bought
+      //   midToken, // The middle token used for swaps
+      //   midTokenType, // Type of the middle token
+      //   sellingTokensType, // Types of the selling tokens
+      //   buyingTokensType // Types of the buying tokens
+
+      // );
+      let AppicActo = await artemisWalletAdapter.getCanisterActor(canistersIDs.APPIC_MULTISWAP, AppicMultiswapidlFactory, false);
+      console.log('----------------------');
+      console.log(sellingTokens[0], buyingTokens[0], sellingTokensType[0], buyingTokensType[0], sellAmounts[0]);
+      console.log('----------------------');
+      let sendMultiTras = await AppicActo.singleComparedSwap(
+        sellingTokens[0],
+        buyingTokens[0],
+        sellingTokensType[0],
+        buyingTokensType[0],
+        sellAmounts[0]
+      );
+      console.log(sendMultiTras);
     } catch (error) {
       console.log(error);
     }
@@ -226,6 +241,7 @@ function MultiSwap() {
         // Mark the ID as seen
         seenIds[obj.id] = true;
         obj.newPercentage = Math.round(obj.newPercentage);
+        obj.percentage = Math.round(obj.percentage);
         // Add the object to the filtered array
         filteredArr.push(obj);
       } else if (seenIds[obj.id] && obj.newPercentage !== 0) {
@@ -233,6 +249,7 @@ function MultiSwap() {
         // Replace the previous object with the current object in the filtered array
         filteredArr = filteredArr.filter((o) => o.id !== obj.id);
         obj.newPercentage = Math.round(obj.newPercentage);
+        obj.percentage = Math.round(obj.percentage);
         filteredArr.push(obj);
       }
     }
