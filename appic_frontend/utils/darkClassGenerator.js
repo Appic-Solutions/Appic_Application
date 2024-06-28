@@ -1,7 +1,7 @@
-"use client";
+'use client';
 
-import { getState } from "@/redux/store";
-import { useSelector } from "react-redux";
+import { getState } from '@/redux/store';
+import { useSelector } from 'react-redux';
 
 // function for generating class name for dark mode
 
@@ -29,13 +29,10 @@ export default function darkModeClassnamegenerator(className, activable) {
   }
 }
 
-
-export function darkClassGenerator(isDark,className) {
-
+export function darkClassGenerator(isDark, className) {
   if (isDark == true) {
     return `${className}  dark`;
   } else {
     return `${className} `;
   }
-
 }
