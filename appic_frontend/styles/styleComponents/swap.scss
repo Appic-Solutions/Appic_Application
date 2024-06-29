@@ -1,3 +1,122 @@
-.swaqp__container{
-    
+.swap {
+  //   background-color: #000;
+  width: 50%;
+  height: 50vh;
+  margin: auto;
+  .swap__container {
+    display: flex;
+    justify-content: center;
+    .swap__config {
+      margin-top: 2rem;
+      background-color: $light-box-bg;
+      border-radius: $border-radius;
+      padding: 3rem;
+      width: 65%;
+      .fromtoContainer {
+        display: grid;
+        grid-template-columns: 1fr 2rem 1fr;
+        align-items: center;
+        justify-content: space-between;
+        .tokenContainer {
+          cursor: pointer;
+
+          background-color: $light-bg;
+          padding: 2rem;
+          width: 100%;
+          border-radius: $border-radius;
+          span {
+            font-size: 1.3rem;
+            font-weight: 600;
+          }
+          .token {
+            margin-top: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.7rem;
+            img {
+              width: 45px;
+              height: 45px;
+            }
+            .tokenDetails {
+              display: flex;
+              flex-direction: column;
+              gap: 0.2rem;
+              h3 {
+                font-size: 1.7rem;
+              }
+              p {
+                font-size: 1.2rem;
+              }
+            }
+          }
+        }
+        .arrow {
+          border: 1px solid $light-primary;
+          border-radius: 50%;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          width: 2rem;
+          height: 2rem;
+          svg {
+            fill: $light-primary;
+            width: 10px;
+            height: 10px;
+          }
+        }
+      }
+      .amountContainer {
+        span {
+          font-size: 1.3rem;
+          font-weight: 600;
+        }
+        width: 100%;
+        margin-top: 2rem;
+        background-color: $light-bg;
+        border-radius: $border-radius;
+        padding: 2rem;
+
+        .details {
+          margin-top: 1rem;
+          display: flex;
+          align-items: center;
+          gap: 1rem;
+        }
+        cursor: pointer;
+        .tokenLogo {
+          width: 45px;
+          height: 45px;
+        }
+        .input_container {
+          width: 100%;
+          input {
+            width: 100%;
+            height: 45px;
+            background-color: $light-bg;
+            font-size: 1.7rem;
+            font-weight: 700;
+
+            outline: none;
+          }
+          .usdPrice {
+            color: #1b1b1bc4;
+            font-size: 1rem;
+          }
+        }
+      }
+
+      .swap_btn {
+        background-color: $light-secondary;
+        color: #fff;
+        border-radius: $border-radius;
+        width: 100%;
+        text-align: center;
+        padding: 1rem;
+        margin-top: 2rem;
+        font-size: 1.6rem;
+        font-size: 600;
+      }
+    }
+  }
 }
+
