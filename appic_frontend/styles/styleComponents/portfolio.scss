@@ -65,6 +65,37 @@
         }
       }
     }
+    .disconnect__container {
+      cursor: pointer;
+      display: flex;
+      flex-direction: row;
+      justify-content: start;
+      align-items: center;
+      gap: 0.5rem;
+      p {
+        font-size: 1rem;
+        font-weight: 600;
+      }
+      .disconnetc {
+        width: 25px;
+        height: 25px;
+        border: 1px solid $light-percentageDown;
+        border-radius: 50%;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        svg {
+          width: 15px;
+          fill: $light-percentageDown;
+        }
+      }
+      &:hover {
+        .disconnetc {
+          background-color: $light-bg;
+        }
+      }
+    }
     .upperContainer {
       display: none;
       .walletActions {
@@ -175,79 +206,57 @@
     .portfolio__box {
       background-color: $dark-box-bg;
       border: 1px solid $dark-border;
+      border-radius: $border-radius;
 
       .refreshButton {
       }
 
-      .upperContainer {
-        .walletActions {
-          .addressActions {
-            .avatarImage {
-              width: 36px;
-              height: 36px;
-              background: $default-gradient45;
-              border-radius: 50%;
-            }
-
-            .addressContainer {
-              .address {
-                color: $dark-primary;
-              }
-
-              .copyAddress {
-                img {
-                }
-              }
-            }
-          }
-
-          .actions {
-            .action {
-              // @include button-responsive(mobile);
-              .imgContainer {
-                border: 1px solid $dark-secondary;
-
-                svg {
-                  fill: $dark-secondary;
-                }
-              }
-
-              p {
-                color: $dark-primary;
-              }
-
-              .action:nth-child(3) {
-              }
-            }
-          }
+      .collapseContainer {
+        .titleContainer {
+        }
+        .chartContainer {
+        }
+      }
+      .addressActions {
+        .avatarImage {
+          background: $default-gradient45;
         }
 
-        .portfolio__totalBalance {
-          .description {
-            abbr {
+        .addressContainer {
+          .addressWithCopy {
+            .address {
               color: $dark-primary;
             }
-
-            color: $dark-primary;
-
-            p {
-              color: $dark-primary;
-            }
-
-            .chainIMG {
-            }
-          }
-
-          .balance {
-            h1 {
-              color: $dark-primary;
-            }
-
             span {
               color: $dark-primary;
             }
+            .copyAddress {
+              img {
+              }
+            }
           }
         }
+      }
+      .disconnect__container {
+        p {
+          color: $dark-primary;
+        }
+        .disconnetc {
+          border: 1px solid $dark-percentageDown;
+
+          svg {
+            fill: $dark-percentageDown;
+          }
+        }
+        &:hover {
+          .disconnetc {
+            background-color: $dark-bg;
+          }
+        }
+      }
+
+      .collapseCard {
+        display: none;
       }
     }
   }
@@ -331,6 +340,37 @@
         //     align-content: flex-start;
         .titleContainer {
           display: block;
+        }
+        .disconnect__container {
+          cursor: pointer;
+          display: flex;
+          flex-direction: column;
+          justify-content: center;
+          align-items: center;
+          gap: 0.5rem;
+          p {
+            font-size: 1.2rem;
+            font-weight: 600;
+          }
+          .disconnetc {
+            width: 45px;
+            height: 45px;
+            border: 1px solid $light-percentageDown;
+            border-radius: 50%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            svg {
+              width: 30px;
+              fill: $light-percentageDown;
+            }
+          }
+          &:hover {
+            .disconnetc {
+              background-color: $light-bg;
+            }
+          }
         }
         .chartContainer {
           display: block;
@@ -540,6 +580,23 @@
                 img {
                 }
               }
+            }
+          }
+        }
+        .disconnect__container {
+          p {
+            color: $dark-primary;
+          }
+          .disconnetc {
+            border: 1px solid $dark-percentageDown;
+
+            svg {
+              fill: $dark-percentageDown;
+            }
+          }
+          &:hover {
+            .disconnetc {
+              background-color: $dark-bg;
             }
           }
         }

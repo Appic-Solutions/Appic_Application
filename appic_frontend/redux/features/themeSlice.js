@@ -1,10 +1,10 @@
-import { createSlice, PayloadAction } from "@reduxjs/toolkit";
+import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 
 const initialMode = {
-  isDark: false,
+  isDark: true,
 };
 const themeSlice = createSlice({
-  name: "themeSlice",
+  name: 'themeSlice',
   initialState: initialMode,
   reducers: {
     switchMode: (state) => {
@@ -21,7 +21,7 @@ const initialsideBar = {
 };
 
 const sidebarSlice = createSlice({
-  name: "sidbarSlice",
+  name: 'sidbarSlice',
   initialState: initialsideBar,
   reducers: {
     reverseSideBar: (state) => {
@@ -36,3 +36,4 @@ export const { switchMode, setMode } = themeSlice.actions;
 
 export const sidebarReducer = sidebarSlice.reducer;
 export const { reverseSideBar } = sidebarSlice.actions;
+
