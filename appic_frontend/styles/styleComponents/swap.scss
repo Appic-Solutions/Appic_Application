@@ -1,120 +1,183 @@
-.swap {
-  //   background-color: #000;
-  width: 50%;
-  height: 50vh;
-  margin: auto;
-  .swap__container {
-    display: flex;
-    justify-content: center;
-    .swap__config {
-      margin-top: 2rem;
-      background-color: $light-box-bg;
-      border-radius: $border-radius;
-      padding: 3rem;
-      width: 65%;
-      .fromtoContainer {
-        display: grid;
-        grid-template-columns: 1fr 2rem 1fr;
-        align-items: center;
-        justify-content: space-between;
-        .tokenContainer {
-          cursor: pointer;
+@media screen and (min-width: 1024px) {
+  .swap {
+    //   background-color: #000;
+    width: 50%;
+    height: 50vh;
+    margin: auto;
+    .swap__container {
+      display: flex;
+      justify-content: center;
 
-          background-color: $light-bg;
-          padding: 2rem;
-          width: 100%;
-          border-radius: $border-radius;
+      .swap__config {
+        border: 1px solid $light-border;
+
+        .title {
+          margin-bottom: 2rem;
+          margin-left: 0.5rem;
+        }
+        margin-top: 2rem;
+        background-color: $light-box-bg;
+        border-radius: $border-radius;
+        padding: 3rem;
+        width: 65%;
+        .fromtoContainer {
+          display: grid;
+          grid-template-columns: 1fr 2rem 1fr;
+          align-items: center;
+          justify-content: space-between;
+          .tokenContainer {
+            border: 1px solid $light-border;
+
+            cursor: pointer;
+
+            background-color: $light-bg;
+            padding: 2rem;
+            width: 100%;
+            border-radius: $border-radius;
+            span {
+              font-size: 1.3rem;
+              font-weight: 600;
+            }
+            .token {
+              margin-top: 1rem;
+              display: flex;
+              align-items: center;
+              gap: 0.7rem;
+              img {
+                width: 45px;
+                height: 45px;
+              }
+              .tokenDetails {
+                display: flex;
+                flex-direction: column;
+                gap: 0.2rem;
+                h3 {
+                  font-size: 1.7rem;
+                }
+                p {
+                  font-size: 1.2rem;
+                }
+              }
+            }
+          }
+          .arrow {
+            border: 1px solid $light-primary;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 2rem;
+            height: 2rem;
+            svg {
+              fill: $light-primary;
+              width: 10px;
+              height: 10px;
+            }
+          }
+        }
+        .amountContainer {
+          border: 1px solid $light-border;
           span {
             font-size: 1.3rem;
             font-weight: 600;
           }
-          .token {
+          width: 100%;
+          margin-top: 2rem;
+          background-color: $light-bg;
+          border-radius: $border-radius;
+          padding: 2rem;
+          .details {
             margin-top: 1rem;
             display: flex;
             align-items: center;
-            gap: 0.7rem;
-            img {
-              width: 45px;
-              height: 45px;
-            }
-            .tokenDetails {
-              display: flex;
-              flex-direction: column;
-              gap: 0.2rem;
-              h3 {
-                font-size: 1.7rem;
-              }
-              p {
-                font-size: 1.2rem;
-              }
-            }
+            gap: 1rem;
           }
-        }
-        .arrow {
-          border: 1px solid $light-primary;
-          border-radius: 50%;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          width: 2rem;
-          height: 2rem;
-          svg {
-            fill: $light-primary;
-            width: 10px;
-            height: 10px;
-          }
-        }
-      }
-      .amountContainer {
-        span {
-          font-size: 1.3rem;
-          font-weight: 600;
-        }
-        width: 100%;
-        margin-top: 2rem;
-        background-color: $light-bg;
-        border-radius: $border-radius;
-        padding: 2rem;
-
-        .details {
-          margin-top: 1rem;
-          display: flex;
-          align-items: center;
-          gap: 1rem;
-        }
-        cursor: pointer;
-        .tokenLogo {
-          width: 45px;
-          height: 45px;
-        }
-        .input_container {
-          width: 100%;
-          input {
-            width: 100%;
+          cursor: pointer;
+          .tokenLogo {
+            width: 45px;
             height: 45px;
-            background-color: $light-bg;
-            font-size: 1.7rem;
-            font-weight: 700;
+          }
+          .inputdatacontainer {
+            display: grid;
+            width: 100%;
+            grid-template-columns: 1fr 0.5fr;
+            input {
+              width: 100%;
+              // height: 40px;
+              background-color: $light-bg;
+              font-size: 1.7rem;
+              font-weight: 700;
+              padding: 1rem 0;
+              outline: none;
+            }
+            input[type='number']::-webkit-outer-spin-button,
+            input[type='number']::-webkit-inner-spin-button {
+              -webkit-appearance: none;
+              margin: 0;
+            }
 
-            outline: none;
+            /* For Firefox */
+            input[type='number']::-moz-number-spinners {
+              -moz-appearance: none;
+            }
+            .buttonContainer {
+              // bo/rder: 1px solid #000;
+              display: flex;
+              justify-content: right;
+              align-items: center;
+              button {
+                font-size: 1rem;
+                background-color: $light-secondary;
+                color: #fff;
+                padding: 0.5rem 1rem;
+
+                border-radius: $border-radius;
+                font-weight: 800;
+                cursor: pointer;
+              }
+            }
+
+            .usdPrice {
+              color: #1b1b1bc4;
+              font-size: 1rem;
+            }
+
+            .balance {
+              color: #1b1b1bc4;
+              font-size: 1rem;
+              text-align: right;
+            }
           }
-          .usdPrice {
-            color: #1b1b1bc4;
-            font-size: 1rem;
-          }
+          // .input_container {
+          //   width: 100%;
+          //
+
+          // }
+          // .balancecontainer {
+          //   display: flex;
+          //   flex-direction: column;
+          //   button {
+          //
+          //   }
+          //   span {
+          //     font-size: 1rem;
+          //     font-weight: 500;
+          //   }
+          // }
         }
-      }
 
-      .swap_btn {
-        background-color: $light-secondary;
-        color: #fff;
-        border-radius: $border-radius;
-        width: 100%;
-        text-align: center;
-        padding: 1rem;
-        margin-top: 2rem;
-        font-size: 1.6rem;
-        font-size: 600;
+        .swap_btn {
+          background-color: $light-secondary;
+          color: #fff;
+          border-radius: $border-radius;
+          width: 100%;
+          text-align: center;
+          padding: 1rem;
+          margin-top: 2rem;
+          font-size: 1.6rem;
+          font-size: 600;
+          cursor: pointer;
+        }
       }
     }
   }

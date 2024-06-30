@@ -596,6 +596,17 @@
       .token_balance {
         font-size: 1.2rem;
       }
+      .token_balanceAndPrice {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-end;
+        h3 {
+          font-size: 1.2rem;
+        }
+        p {
+          font-size: 1rem;
+        }
+      }
     }
     &::-webkit-scrollbar {
       width: 10px;
@@ -630,8 +641,62 @@
         color: $dark-primary;
       }
     }
+    .searchContainer {
+      border: 1px solid $dark-border;
+      border-radius: $border-radius;
+      background-color: $dark-box-bg;
+      .searchIcon {
+        fill: $dark-secondary;
+      }
+      input {
+        color: $dark-primary;
+        &::placeholder {
+          color: $dark-placeholder;
+        }
+      }
+    }
     .seprator {
-      background-color: $dark-tertiary;
+      background-color: $dark-border;
+    }
+    .tokens {
+      .token {
+        background-color: $dark-box-bg;
+        border-radius: $border-radius;
+        .token_info {
+          .token_logo {
+            border: 1px solid rgba(0, 0, 0, 0.1);
+          }
+          .token_details {
+            .token_name {
+              color: $dark-primary;
+            }
+            .token_symbol {
+              color: $dark-secondary;
+            }
+          }
+        }
+
+        .token_balance {
+        }
+        .token_balanceAndPrice {
+          color: $dark-primary;
+          h3 {
+          }
+          p {
+          }
+        }
+      }
+      &::-webkit-scrollbar {
+      }
+
+      &::-webkit-scrollbar-track {
+        background-color: #e4e4e4;
+      }
+
+      &::-webkit-scrollbar-thumb {
+        background-image: $default-gradientToBottom;
+        box-shadow: inset 2px 2px 5px 0 rgba(#fff, 0.5);
+      }
     }
   }
 }
@@ -750,6 +815,18 @@
         .token_balance {
           font-size: 1.3rem;
         }
+        .token_balanceAndPrice {
+          display: flex;
+          flex-direction: column;
+          align-items: flex-end;
+          h3 {
+            font-size: 1.2rem;
+          }
+          p {
+            font-size: 1.1rem;
+            font-weight: 700;
+          }
+        }
       }
 
       &::-webkit-scrollbar {
@@ -772,7 +849,9 @@
       .topSection {
         .backBTN {
           color: $dark-primary;
+
           svg {
+            fill: none;
           }
         }
         .closeBTN {
@@ -784,8 +863,67 @@
           color: $dark-primary;
         }
       }
+      .searchContainer {
+        border: 1px solid $dark-border;
+
+        border-radius: $border-radius;
+        background-color: $dark-box-bg;
+        .searchIcon {
+          fill: $dark-secondary;
+        }
+        input {
+          color: $dark-primary;
+
+          &::placeholder {
+            color: $dark-placeholder;
+          }
+        }
+      }
       .seprator {
         background-color: $dark-tertiary;
+      }
+      .tokens {
+        .token {
+          background-color: $dark-box-bg;
+          border-radius: $border-radius;
+          .token_info {
+            .token_logo {
+              border: 1px solid rgba(0, 0, 0, 0.1);
+            }
+            .token_details {
+              .token_name {
+                color: $dark-primary;
+              }
+              .token_symbol {
+                color: $dark-secondary;
+              }
+            }
+          }
+
+          .token_balance {
+            color: $dark-primary;
+          }
+          .token_balanceAndPrice {
+            h3 {
+              color: $dark-primary;
+            }
+            p {
+              color: $dark-primary;
+            }
+          }
+        }
+
+        &::-webkit-scrollbar {
+        }
+
+        &::-webkit-scrollbar-track {
+          background-color: #e4e4e4;
+        }
+
+        &::-webkit-scrollbar-thumb {
+          background-image: $default-gradientToBottom;
+          box-shadow: inset 2px 2px 5px 0 rgba(#fff, 0.5);
+        }
       }
     }
   }
