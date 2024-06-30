@@ -1,20 +1,30 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import Title from './higerOrderComponents/titlesAndHeaders';
 import { useSelector } from 'react-redux';
 import darkModeClassnamegenerator from '@/utils/darkClassGenerator';
 import Modal from './higerOrderComponents/modal';
 import { applyDecimals, formatDecimalValue, formatPrice, formatSignificantNumber } from '@/helper/number_formatter';
 import BigNumber from 'bignumber.js';
+import LoadingComponent from './higerOrderComponents/loadingComponent';
 
 function Swap(props) {
   const [tokenModal, setTokenModal] = useState({ isActive: false, modalType: 'sell', tokens: [] }); // modalType: buy, sell
   const [swapData, setSwapData] = useState({
-    sellToken: null,
-    buyToken: null,
-    sellTokenBalance: null,
-    amountToSell: null,
+    sellToken: {
+      id: 'ryjl3-tyaaa-aaaaa-aaaba-cai',
+      name: 'Select Token',
+      symbol: 'XYZ',
+      logo: '/blankToken.png',
+    },
+    buyToken: {
+      id: 'mxzaz-hqaaa-aaaar-qaada-cai',
+      name: 'Select Token',
+      symbol: 'ABC',
+      logo: '/blankToken.png',
+    },
+    amountToSell: 0,
   });
   const [tokenContractToShow, setTokenContractToShow] = useState('');
 
@@ -28,10 +38,11 @@ function Swap(props) {
   const loader = useSelector((state) => state.wallet.items.loader);
   const supportedTokens = useSelector((state) => state.supportedTokens.tokens);
 
+  //   Sort tokens for the buy modal
   const sortTokensByPrice = () => {
     return [...supportedTokens].sort((a, b) => Number(b.price) - Number(a.price));
   };
-
+  //   Token moodals search
   function searchinput(tokens, query) {
     console.log(tokens);
     // Convert the query to lowercase for case-insensitive search
@@ -46,68 +57,96 @@ function Swap(props) {
     return filteredtokens.sort((a, b) => Number(b.price) - Number(a.price));
   }
 
+  // handle select tokens mode=  sell, buy
+  const handleSelect = (mode, token) => {
+    if (mode == 'buy') {
+      setSwapData({ ...swapData, buyToken: token });
+    } else {
+      setSwapData({ ...swapData, sellToken: token });
+    }
+    setTokenModal({ ...tokenModal, isActive: false });
+  };
+
   return (
     <>
       <div className={darkModeClassnamegenerator('swap')}>
-        <div className="swap__container">
-          <div className="swap__config">
-            <h2 className="title">Swap</h2>
-            <div className="fromtoContainer">
-              <div
-                onClick={() => {
-                  setTokenModal({ isActive: true, modalType: 'sell', tokens: assets });
-                }}
-                className="tokenContainer from"
-              >
-                <span>From</span>
-                <div className="token">
-                  <img src="/ckBTC.png" alt="" />
-                  <div className="z">
-                    <h3>ICP</h3>
-                    <p>internet computer</p>
+        {loader && <LoadingComponent></LoadingComponent>}
+        {!loader && (
+          <div className="swap__container">
+            <div className="swap__config">
+              <h2 className="title">Swap</h2>
+              <div className="fromtoContainer">
+                <div
+                  onClick={() => {
+                    setTokenModal({ isActive: true, modalType: 'sell', tokens: assets });
+                  }}
+                  className="tokenContainer from"
+                >
+                  <span>From</span>
+                  <div className="token">
+                    <img src={swapData.sellToken.logo} alt="" />
+                    <div className="tokenDetails">
+                      <h3>{swapData.sellToken.symbol}</h3>
+                      <p>{swapData.sellToken.name}</p>
+                    </div>
+                  </div>
+                </div>
+                <div className="arrow">
+                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512">
+                    <path d="M438.6 278.6c12.5-12.5 12.5-32.8 0-45.3l-160-160c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3L338.8 224 32 224c-17.7 0-32 14.3-32 32s14.3 32 32 32l306.7 0L233.4 393.4c-12.5 12.5-12.5 32.8 0 45.3s32.8 12.5 45.3 0l160-160z" />
+                  </svg>
+                </div>
+                <div
+                  onClick={() => {
+                    setTokenModal({ isActive: true, modalType: 'buy', tokens: sortTokensByPrice() });
+                  }}
+                  className="tokenContainer to"
+                >
+                  <span>To</span>
+                  <div className="token">
+                    <img src={swapData.buyToken.logo} alt="" />
+                    <div className="tokenDetails">
+                      <h3>{swapData.buyToken.symbol}</h3>
+                      <p>{swapData.buyToken.name}</p>
+                    </div>
                   </div>
                 </div>
               </div>
-              <div className="arrow">
-                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512">
-                  <path d="M438.6 278.6c12.5-12.5 12.5-32.8 0-45.3l-160-160c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3L338.8 224 32 224c-17.7 0-32 14.3-32 32s14.3 32 32 32l306.7 0L233.4 393.4c-12.5 12.5-12.5 32.8 0 45.3s32.8 12.5 45.3 0l160-160z" />
-                </svg>
-              </div>
-              <div
-                onClick={() => {
-                  setTokenModal({ isActive: true, modalType: 'buy', tokens: sortTokensByPrice() });
-                }}
-                className="tokenContainer to"
-              >
-                <span>To</span>
-                <div className="token">
-                  <img src="/ckBTC.png" alt="" />
-                  <div className="tokenDetails">
-                    <h3>ckUSDC</h3>
-                    <p>Bitcoin</p>
-                  </div>
-                </div>
-              </div>
-            </div>
-            <div className="amountContainer">
-              <span>Amount</span>
-              <div className="details">
-                <img src="/ckBTC.png" className="tokenLogo" alt="" />
+              <div className="amountContainer">
+                <span>Amount</span>
+                <div className="details">
+                  <img src={swapData.sellToken.logo} className="tokenLogo" alt="" />
 
-                <div className="inputdatacontainer">
-                  <input type="number" placeholder="0" />
-                  <div className="buttonContainer">
-                    <button>Max</button>
+                  <div className="inputdatacontainer">
+                    <input
+                      onChange={(e) => {
+                        console.log(swapData);
+                        setSwapData({ ...swapData, amountToSell: e.target.value });
+                      }}
+                      value={swapData.amountToSell}
+                      type="number"
+                      placeholder="0"
+                    />
+                    <div className="buttonContainer">
+                      <button
+                        onClick={() => {
+                          console.log(swapData.sellToken);
+                          setSwapData({ ...swapData, amountToSell: applyDecimals(swapData.sellToken.balance, swapData.sellToken.decimals) });
+                        }}
+                      >
+                        Max
+                      </button>
+                    </div>
+                    <p className="usdPrice">${BigNumber(swapData.amountToSell).multipliedBy(swapData.sellToken.price).toNumber()}</p>
+                    <span className="balance">available/ {applyDecimals(swapData.sellToken.balance, swapData.sellToken.decimals) || 0}</span>
                   </div>
-                  <p className="usdPrice">$0</p>
-                  <span className="balance">available/ 0</span>
                 </div>
               </div>
+              <button className="swap_btn">Start Swapping</button>
             </div>
-            <button className="swap_btn">Start Swapping</button>
+            <div className="swap__routes"></div>
           </div>
-          <div className="swap__routes"></div>
-        </div>
+        )}
       </div>
 
       {/* Add token modal */}
@@ -152,7 +191,7 @@ function Swap(props) {
               return (
                 <div
                   onClick={() => {
-                    // handleTokenSelection(token);
+                    handleSelect(tokenModal.modalType, token);
                   }}
                   key={token.id}
                   className="token"

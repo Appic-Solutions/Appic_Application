@@ -44,6 +44,7 @@
               align-items: center;
               gap: 0.7rem;
               img {
+                border-radius: 50%;
                 width: 45px;
                 height: 45px;
               }
@@ -94,6 +95,7 @@
           }
           cursor: pointer;
           .tokenLogo {
+            border-radius: 50%;
             width: 45px;
             height: 45px;
           }
@@ -177,6 +179,95 @@
           font-size: 1.6rem;
           font-size: 600;
           cursor: pointer;
+        }
+      }
+    }
+    &.dark {
+      .swap__container {
+        .swap__config {
+          border: 1px solid $dark-border;
+
+          .title {
+            color: $dark-primary;
+          }
+          background-color: $dark-box-bg;
+          border-radius: $border-radius;
+          .fromtoContainer {
+            .tokenContainer {
+              border: 1px solid $dark-border;
+
+              background-color: $dark-bg;
+              border-radius: $border-radius;
+              span {
+                color: $dark-primary;
+              }
+              .token {
+                img {
+                }
+                .tokenDetails {
+                  h3 {
+                    color: $dark-primary;
+                  }
+                  p {
+                    color: $dark-primary;
+                  }
+                }
+              }
+            }
+            .arrow {
+              border: 1px solid $dark-primary;
+
+              svg {
+                fill: $dark-primary;
+              }
+            }
+          }
+          .amountContainer {
+            border: 1px solid $dark-border;
+            span {
+              color: $dark-primary;
+            }
+
+            background-color: $dark-bg;
+            .details {
+            }
+            .tokenLogo {
+            }
+            .inputdatacontainer {
+              input {
+                color: $dark-primary;
+
+                background-color: $dark-bg;
+              }
+              input[type='number']::-webkit-outer-spin-button,
+              input[type='number']::-webkit-inner-spin-button {
+                -webkit-appearance: none;
+              }
+
+              /* For Firefox */
+              input[type='number']::-moz-number-spinners {
+                -moz-appearance: none;
+              }
+              .buttonContainer {
+                button {
+                  background-color: $dark-secondary;
+                  border-radius: $border-radius;
+                }
+              }
+
+              .usdPrice {
+                color: $dark-primary;
+              }
+
+              .balance {
+                color: $dark-primary;
+              }
+            }
+          }
+
+          .swap_btn {
+            background-color: $dark-secondary;
+          }
         }
       }
     }
