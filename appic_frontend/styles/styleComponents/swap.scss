@@ -1,31 +1,33 @@
 @media screen and (min-width: 1024px) {
   .swap {
     //   background-color: #000;
-    width: 50%;
+    width: 65%;
     height: 50vh;
     margin: auto;
     .swap__container {
       display: flex;
       justify-content: center;
-
+      margin-top: 2rem;
+      gap: 2rem;
       .swap__config {
         border: 1px solid $light-border;
-
-        .title {
-          margin-bottom: 2rem;
-          margin-left: 0.5rem;
-        }
-        margin-top: 2rem;
         background-color: $light-box-bg;
         border-radius: $border-radius;
         padding: 3rem;
         width: 65%;
+        .title {
+          margin-bottom: 2rem;
+          margin-left: 0.5rem;
+        }
         .fromtoContainer {
           display: grid;
           grid-template-columns: 1fr 2rem 1fr;
           align-items: center;
           justify-content: space-between;
           .tokenContainer {
+            &:hover {
+              background-color: #ebebeb;
+            }
             border: 1px solid $light-border;
 
             cursor: pointer;
@@ -182,6 +184,104 @@
         }
       }
     }
+    .swap__routes {
+      width: 35%;
+      background-color: $light-box-bg;
+      border-radius: $border-radius;
+      max-height: 50vh;
+      transition: all 0.2s ease-in;
+
+      width: 0vw;
+      overflow: hidden;
+      padding: 0;
+      border: none;
+
+      .swapAndTimer {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 2rem;
+        .title {
+          // margin-left: 0.5rem;
+        }
+      }
+      .dexs {
+        .dex {
+          cursor: pointer;
+          margin-bottom: 1rem;
+          background-color: $light-bg;
+          border: 1px solid $light-border;
+          padding: 1rem;
+          border-radius: 20px;
+
+          .badge {
+            margin-bottom: 1rem;
+            padding: 0.6rem 1rem;
+            background-color: $light-secondary;
+            border-radius: $border-radius;
+            color: #fff;
+            font-size: 1.2rem;
+            font-weight: 600;
+            width: fit-content;
+          }
+          .return__details {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            img {
+              width: 45px;
+              height: 45px;
+            }
+            .returnDetails {
+              display: flex;
+              flex-direction: column;
+              gap: 0.5rem;
+              .amount {
+                font-size: 1.4rem;
+              }
+              .dexAndusdPrice {
+                display: flex;
+                align-items: center;
+                gap: 1rem;
+                p {
+                  font-size: 1.1rem;
+                }
+                .dexDetails {
+                  display: flex;
+                  align-items: center;
+                  gap: 0.5rem;
+                  img {
+                    width: 15px;
+                    height: 15px;
+                    border-radius: 50%;
+                  }
+                  p {
+                    font-size: 1.1rem;
+                    color: $light-secondary;
+                    font-weight: 800;
+                  }
+                }
+              }
+            }
+          }
+          &.selected {
+            background-color: #c7c7c7;
+            &:hover {
+              background-color: #c7c7c7;
+            }
+          }
+          &:hover {
+            background-color: #ebebeb;
+          }
+        }
+      }
+      &.active {
+        width: 35%;
+        overflow: auto;
+        padding: 3rem;
+        border: 1px solid $light-border;
+      }
+    }
     &.dark {
       .swap__container {
         .swap__config {
@@ -194,6 +294,9 @@
           border-radius: $border-radius;
           .fromtoContainer {
             .tokenContainer {
+              &:hover {
+                background-color: #212029;
+              }
               border: 1px solid $dark-border;
 
               background-color: $dark-bg;
@@ -267,6 +370,61 @@
 
           .swap_btn {
             background-color: $dark-secondary;
+          }
+        }
+        .swap__routes {
+          background-color: $dark-box-bg;
+
+          .swapAndTimer {
+            .title {
+              color: $dark-primary;
+
+              // margin-left: 0.5rem;
+            }
+          }
+          .dexs {
+            .dex {
+              background-color: $dark-bg;
+              border: 1px solid $dark-border;
+              .badge {
+                background-color: $dark-secondary;
+              }
+              .return__details {
+                img {
+                }
+                .returnDetails {
+                  .amount {
+                    color: $dark-primary;
+                  }
+                  .dexAndusdPrice {
+                    p {
+                      color: $dark-primary;
+                    }
+                    .dexDetails {
+                      img {
+                      }
+                      p {
+                        color: $dark-secondary;
+                      }
+                    }
+                  }
+                }
+              }
+              &.selected {
+                color: $dark-primary;
+
+                background-color: #212029;
+                &:hover {
+                  background-color: #212029;
+                }
+              }
+              &:hover {
+                background-color: #212029;
+              }
+            }
+          }
+          &.active {
+            border: 1px solid $dark-border;
           }
         }
       }
