@@ -14,6 +14,8 @@ import canistersIDs from '@/config/canistersIDs';
 import { AppicMultiswapidlFactory, icrcIdlFactory, dip20IdleFactory, icpSwapPools, icpSwapFactory, sonicIdlFactory } from '@/did';
 import { icpSwapAmountOut, sonicSwapAmountOut } from '@/helper/swapHelperFunction';
 
+const principalID = useSelector((state) => state.wallet.items.principalID);
+
 async function swapWithSonic(sellToken, buyToken, sellTokenType, buyTokenType, amtSell) {
   let amountOut = await sonicSwapAmountOut(sellToken, buyToken, amtSell);
   if (amountOut != 0) {
