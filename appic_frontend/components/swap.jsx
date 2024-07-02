@@ -9,6 +9,7 @@ import { applyDecimals, formatDecimalValue, formatPrice, formatSignificantNumber
 import BigNumber from 'bignumber.js';
 import LoadingComponent from './higerOrderComponents/loadingComponent';
 import Countdown from './higerOrderComponents/countdown';
+import { artemisWalletAdapter } from '@/utils/walletConnector';
 import { Principal } from '@dfinity/principal';
 import canistersIDs from '@/config/canistersIDs';
 import { AppicMultiswapidlFactory, icrcIdlFactory, dip20IdleFactory, icpSwapPools, icpSwapFactory, sonicIdlFactory } from '@/did';

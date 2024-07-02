@@ -1,5 +1,6 @@
 import { icpSwapPools, icpSwapFactory, sonicIdlFactory } from '@/did';
 import canistersIDs from '@/config/canistersIDs';
+import { artemisWalletAdapter } from '@/utils/walletConnector';
 async function icpSwapAmountOut(token0Address, token0Standard, token1Address, token1Standard, amountIn) {
   let swapFactoryCanister = await artemisWalletAdapter.getCanisterActor(canistersIDs.ICP_SWAP_FACTORY, icpSwapFactory, true);
   const token0 = { address: token0Address, standard: token0Standard };
