@@ -15,7 +15,7 @@ import canistersIDs from '@/config/canistersIDs';
 import { AppicMultiswapidlFactory, icrcIdlFactory, dip20IdleFactory, icpSwapPools, icpSwapFactory, sonicIdlFactory } from '@/did';
 import { icpSwapAmountOut, sonicSwapAmountOut } from '@/helper/swapHelperFunction';
 
-function Swap() {
+function Swap(props) {
   const [tokenModal, setTokenModal] = useState({ isActive: false, modalType: 'sell', tokens: [] }); // modalType: buy, sell
   const [swapData, setSwapData] = useState({
     sellToken: {
@@ -73,17 +73,38 @@ function Swap() {
     setTokenModal({ ...tokenModal, isActive: false });
   };
 
+  /**
+   * @notice This function swaps tokens using the Sonic platform.
+   * @param sellToken The principal ID of the token to sell.
+   * @param buyToken The principal ID of the token to buy.
+   * @param sellTokenType The type of the token to sell (e.g., 'ICRC1', 'ICRC2', 'YC', 'DIP20').
+   * @param buyTokenType The type of the token to buy.
+   * @param amtSell The amount of the sell token to swap.
+   * @return The transaction result of the swap.
+   * @example
+   * await swapWithSonic('qbizb-wiaaa-aaaaq-aabwq-cai', 'ryjl3-tyaaa-aaaaa-aaaba-cai', 'ICRC1', 'ICRC2', '1000000000000');
+   */
   async function swapWithSonic(sellToken, buyToken, sellTokenType, buyTokenType, amtSell) {
+    // Get the amount of buyToken that can be obtained for amtSell of sellToken.
     let amountOut = await sonicSwapAmountOut(sellToken, buyToken, amtSell);
+
     if (amountOut != 0) {
+      // Create an actor to interact with the APPIC multiswap canister.
       let AppicActor = await artemisWalletAdapter.getCanisterActor(canistersIDs.APPIC_MULTISWAP, AppicMultiswapidlFactory, false);
       let caller = Principal.fromText(principalID);
       let fee;
+
+      // Get the sub-account for the caller.
       const subAccount = await AppicActor.getICRC1SubAccount(caller);
       console.log('subAccount', subAccount);
+
+      // Handle different sell token types.
       if (sellTokenType === 'ICRC1') {
+        // Create an actor for the sell token canister.
         let icrc1 = await artemisWalletAdapter.getCanisterActor(sellToken, icrcIdlFactory, false);
         fee = icrc1.icrc1_fee();
+
+        // Transfer the sell token to the APPIC multiswap canister.
         const tx = await icrc1.icrc1_transfer({
           to: {
             owner: Principal.fromText(canistersIDs.APPIC_MULTISWAP),
@@ -96,8 +117,11 @@ function Swap() {
           amount: BigNumber(amtSell).minus(fee).toNumber(),
         });
       } else if (sellTokenType === 'ICRC2') {
+        // Create an actor for the sell token canister.
         let icrc2 = await artemisWalletAdapter.getCanisterActor(sellToken, icrcIdlFactory, false);
         fee = icrc2.icrc1_fee();
+
+        // Approve the APPIC multiswap canister to spend the sell token.
         const tx = await icrc2.icrc2_approve({
           fee: [],
           memo: [],
@@ -109,10 +133,15 @@ function Swap() {
           spender: { owner: Principal.fromText(canistersIDs.APPIC_MULTISWAP), subaccount: [] },
         });
       } else if (sellTokenType === 'YC' || sellTokenType === 'DIP20') {
+        // Create an actor for the sell token canister.
         let dip20 = await artemisWalletAdapter.getCanisterActor(sellToken, dip20IdleFactory, false);
         fee = dip20.getTokenFee();
+
+        // Approve the APPIC multiswap canister to spend the sell token.
         const tx = await dip20.approve(Principal.fromText(canistersIDs.APPIC_MULTISWAP), BigNumber(amtSell).minus(fee).toNumber());
       }
+
+      // Perform the swap.
       let sendMultiTras = await AppicActor.sonicSwap(
         Principal.fromText(sellToken),
         Principal.fromText(buyToken),
@@ -120,21 +149,44 @@ function Swap() {
         buyTokenType,
         BigNumber(amtSell).minus(fee).toNumber()
       );
+
       console.log(sendMultiTras);
       return sendMultiTras;
     }
   }
+
+  /**
+   * @notice This function swaps tokens using the ICPswap platform.
+   * @param sellToken The principal ID of the token to sell.
+   * @param buyToken The principal ID of the token to buy.
+   * @param sellTokenType The type of the token to sell (e.g., 'ICRC1', 'ICRC2', 'YC', 'DIP20').
+   * @param buyTokenType The type of the token to buy.
+   * @param amtSell The amount of the sell token to swap.
+   * @return The transaction result of the swap.
+   * @example
+   * await swapWithICPswap('qbizb-wiaaa-aaaaq-aabwq-cai', 'ryjl3-tyaaa-aaaaa-aaaba-cai', 'ICRC1', 'ICRC2', '1000000000000');
+   */
   async function swapWithICPswap(sellToken, buyToken, sellTokenType, buyTokenType, amtSell) {
+    // Get the amount of buyToken that can be obtained for amtSell of sellToken.
     let amountOut = await icpSwapAmountOut(sellToken, buyToken, amtSell);
+
     if (amountOut != 0) {
+      // Create an actor to interact with the APPIC multiswap canister.
       let AppicActor = await artemisWalletAdapter.getCanisterActor(canistersIDs.APPIC_MULTISWAP, AppicMultiswapidlFactory, false);
       let caller = Principal.fromText(principalID);
       let fee;
+
+      // Get the sub-account for the caller.
       const subAccount = await AppicActor.getICRC1SubAccount(caller);
       console.log('subAccount', subAccount);
+
+      // Handle different sell token types.
       if (sellTokenType === 'ICRC1') {
+        // Create an actor for the sell token canister.
         let icrc1 = await artemisWalletAdapter.getCanisterActor(sellToken, icrcIdlFactory, false);
         fee = icrc1.icrc1_fee();
+
+        // Transfer the sell token to the APPIC multiswap canister.
         const tx = await icrc1.icrc1_transfer({
           to: {
             owner: Principal.fromText(canistersIDs.APPIC_MULTISWAP),
@@ -147,8 +199,11 @@ function Swap() {
           amount: BigNumber(amtSell).minus(fee).toNumber(),
         });
       } else if (sellTokenType === 'ICRC2') {
+        // Create an actor for the sell token canister.
         let icrc2 = await artemisWalletAdapter.getCanisterActor(sellToken, icrcIdlFactory, false);
         fee = icrc2.icrc1_fee();
+
+        // Approve the APPIC multiswap canister to spend the sell token.
         const tx = await icrc2.icrc2_approve({
           fee: [],
           memo: [],
@@ -160,10 +215,15 @@ function Swap() {
           spender: { owner: Principal.fromText(canistersIDs.APPIC_MULTISWAP), subaccount: [] },
         });
       } else if (sellTokenType === 'YC' || sellTokenType === 'DIP20') {
+        // Create an actor for the sell token canister.
         let dip20 = await artemisWalletAdapter.getCanisterActor(sellToken, dip20IdleFactory, false);
         fee = dip20.getTokenFee();
+
+        // Approve the APPIC multiswap canister to spend the sell token.
         const tx = await dip20.approve(Principal.fromText(canistersIDs.APPIC_MULTISWAP), BigNumber(amtSell).minus(fee).toNumber());
       }
+
+      // Perform the swap.
       let sendMultiTras = await AppicActor.icpSwap(
         Principal.fromText(sellToken),
         Principal.fromText(buyToken),
@@ -171,22 +231,45 @@ function Swap() {
         buyTokenType,
         BigNumber(amtSell).minus(fee).toNumber()
       );
+
       console.log(sendMultiTras);
       return sendMultiTras;
     }
   }
+
+  /**
+   * @notice This function compares the swap results between Sonic and ICPswap platforms and chooses the best one.
+   * @param sellToken The principal ID of the token to sell.
+   * @param buyToken The principal ID of the token to buy.
+   * @param sellTokenType The type of the token to sell (e.g., 'ICRC1', 'ICRC2', 'YC', 'DIP20').
+   * @param buyTokenType The type of the token to buy.
+   * @param amtSell The amount of the sell token to swap.
+   * @return The transaction result of the best swap.
+   * @example
+   * await comparisionSwap('qbizb-wiaaa-aaaaq-aabwq-cai', 'ryjl3-tyaaa-aaaaa-aaaba-cai', 'ICRC1', 'ICRC2', '1000000000000');
+   */
   async function comparisionSwap(sellToken, buyToken, sellTokenType, buyTokenType, amtSell) {
+    // Get the amount of buyToken that can be obtained from both platforms.
     let amountOut0 = await icpSwapAmountOut(sellToken, buyToken, amtSell);
     let amountOut1 = await sonicSwapAmountOut(sellToken, buyToken, amtSell);
+
     if (amountOut1 != 0 && amountOut0 != 0) {
+      // Create an actor to interact with the APPIC multiswap canister.
       let AppicActor = await artemisWalletAdapter.getCanisterActor(canistersIDs.APPIC_MULTISWAP, AppicMultiswapidlFactory, false);
       let caller = Principal.fromText(principalID);
       let fee;
+
+      // Get the sub-account for the caller.
       const subAccount = await AppicActor.getICRC1SubAccount(caller);
       console.log('subAccount', subAccount);
+
+      // Handle different sell token types.
       if (sellTokenType === 'ICRC1') {
+        // Create an actor for the sell token canister.
         let icrc1 = await artemisWalletAdapter.getCanisterActor(sellToken, icrcIdlFactory, false);
         fee = icrc1.icrc1_fee();
+
+        // Transfer the sell token to the APPIC multiswap canister.
         const tx = await icrc1.icrc1_transfer({
           to: {
             owner: Principal.fromText(canistersIDs.APPIC_MULTISWAP),
@@ -199,8 +282,11 @@ function Swap() {
           amount: BigNumber(amtSell).minus(fee).toNumber(),
         });
       } else if (sellTokenType === 'ICRC2') {
+        // Create an actor for the sell token canister.
         let icrc2 = await artemisWalletAdapter.getCanisterActor(sellToken, icrcIdlFactory, false);
         fee = icrc2.icrc1_fee();
+
+        // Approve the APPIC multiswap canister to spend the sell token.
         const tx = await icrc2.icrc2_approve({
           fee: [],
           memo: [],
@@ -212,10 +298,15 @@ function Swap() {
           spender: { owner: Principal.fromText(canistersIDs.APPIC_MULTISWAP), subaccount: [] },
         });
       } else if (sellTokenType === 'YC' || sellTokenType === 'DIP20') {
+        // Create an actor for the sell token canister.
         let dip20 = await artemisWalletAdapter.getCanisterActor(sellToken, dip20IdleFactory, false);
         fee = dip20.getTokenFee();
+
+        // Approve the APPIC multiswap canister to spend the sell token.
         const tx = await dip20.approve(Principal.fromText(canistersIDs.APPIC_MULTISWAP), BigNumber(amtSell).minus(fee).toNumber());
       }
+
+      // Perform the best swap based on comparison.
       let sendMultiTras = await AppicActor.singleComparedSwap(
         Principal.fromText(sellToken),
         Principal.fromText(buyToken),
@@ -223,25 +314,48 @@ function Swap() {
         buyTokenType,
         BigNumber(amtSell).minus(fee).toNumber()
       );
+
       console.log(sendMultiTras);
       return sendMultiTras;
     }
   }
+
+  /**
+   * @notice This function swaps tokens using a mid token as an intermediary for better rates.
+   * @param sellToken The principal ID of the token to sell.
+   * @param buyToken The principal ID of the token to buy.
+   * @param sellTokenType The type of the token to sell (e.g., 'ICRC1', 'ICRC2', 'YC', 'DIP20').
+   * @param buyTokenType The type of the token to buy.
+   * @param amtSell The amount of the sell token to swap.
+   * @return The transaction result of the swap.
+   * @example
+   * await swapWithMidToken('qbizb-wiaaa-aaaaq-aabwq-cai', 'ryjl3-tyaaa-aaaaa-aaaba-cai', 'ICRC1', 'ICRC2', '1000000000000');
+   */
   async function swapWithMidToken(sellToken, buyToken, sellTokenType, buyTokenType, amtSell) {
+    // Get the intermediary token swap amounts from both platforms.
     let amountOut00 = await icpSwapAmountOut(sellToken, canistersIDs.NNS_ICP_LEDGER, amtSell);
     let amountOut01 = await icpSwapAmountOut(canistersIDs.NNS_ICP_LEDGER, buyToken, amountOut00);
     let amountOut10 = await sonicSwapAmountOut(sellToken, canistersIDs.NNS_ICP_LEDGER, amtSell);
     let amountOut11 = await sonicSwapAmountOut(canistersIDs.NNS_ICP_LEDGER, buyToken, amountOut10);
+
     if (amountOut11 != 0 && amountOut01 != 0) {
       let midToken = Principal.fromText(canistersIDs.NNS_ICP_LEDGER);
+      // Create an actor to interact with the APPIC multiswap canister.
       let AppicActor = await artemisWalletAdapter.getCanisterActor(canistersIDs.APPIC_MULTISWAP, AppicMultiswapidlFactory, false);
       let caller = Principal.fromText(principalID);
       let fee;
+
+      // Get the sub-account for the caller.
       const subAccount = await AppicActor.getICRC1SubAccount(caller);
       console.log('subAccount', subAccount);
+
+      // Handle different sell token types.
       if (sellTokenType === 'ICRC1') {
+        // Create an actor for the sell token canister.
         let icrc1 = await artemisWalletAdapter.getCanisterActor(sellToken, icrcIdlFactory, false);
         fee = icrc1.icrc1_fee();
+
+        // Transfer the sell token to the APPIC multiswap canister.
         const tx = await icrc1.icrc1_transfer({
           to: {
             owner: Principal.fromText(canistersIDs.APPIC_MULTISWAP),
@@ -254,8 +368,11 @@ function Swap() {
           amount: BigNumber(amtSell).minus(fee).toNumber(),
         });
       } else if (sellTokenType === 'ICRC2') {
+        // Create an actor for the sell token canister.
         let icrc2 = await artemisWalletAdapter.getCanisterActor(sellToken, icrcIdlFactory, false);
         fee = icrc2.icrc1_fee();
+
+        // Approve the APPIC multiswap canister to spend the sell token.
         const tx = await icrc2.icrc2_approve({
           fee: [],
           memo: [],
@@ -267,10 +384,15 @@ function Swap() {
           spender: { owner: Principal.fromText(canistersIDs.APPIC_MULTISWAP), subaccount: [] },
         });
       } else if (sellTokenType === 'YC' || sellTokenType === 'DIP20') {
+        // Create an actor for the sell token canister.
         let dip20 = await artemisWalletAdapter.getCanisterActor(sellToken, dip20IdleFactory, false);
         fee = dip20.getTokenFee();
+
+        // Approve the APPIC multiswap canister to spend the sell token.
         const tx = await dip20.approve(Principal.fromText(canistersIDs.APPIC_MULTISWAP), BigNumber(amtSell).minus(fee).toNumber());
       }
+
+      // Perform the swap with the intermediary token.
       let sendMultiTras = await AppicActor.swapWithMidToken(
         Principal.fromText(sellToken),
         midToken,
@@ -280,6 +402,7 @@ function Swap() {
         'ICRC2',
         buyTokenType
       );
+
       console.log(sendMultiTras);
       return sendMultiTras;
     }
