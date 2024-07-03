@@ -15,221 +15,7 @@ import canistersIDs from '@/config/canistersIDs';
 import { AppicMultiswapidlFactory, icrcIdlFactory, dip20IdleFactory, icpSwapPools, icpSwapFactory, sonicIdlFactory } from '@/did';
 import { icpSwapAmountOut, sonicSwapAmountOut } from '@/helper/swapHelperFunction';
 
-const principalID = useSelector((state) => state.wallet.items.principalID);
-
-async function swapWithSonic(sellToken, buyToken, sellTokenType, buyTokenType, amtSell) {
-  let amountOut = await sonicSwapAmountOut(sellToken, buyToken, amtSell);
-  if (amountOut != 0) {
-    let AppicActor = await artemisWalletAdapter.getCanisterActor(canistersIDs.APPIC_MULTISWAP, AppicMultiswapidlFactory, false);
-    let caller = Principal.fromText(principalID);
-    let fee;
-    const subAccount = await AppicActor.getICRC1SubAccount(caller);
-    console.log('subAccount', subAccount);
-    if (sellTokenType === 'ICRC1') {
-      let icrc1 = await artemisWalletAdapter.getCanisterActor(sellToken, icrcIdlFactory, false);
-      fee = icrc1.icrc1_fee();
-      const tx = await icrc1.icrc1_transfer({
-        to: {
-          owner: Principal.fromText(canistersIDs.APPIC_MULTISWAP),
-          subaccount: [subAccount],
-        },
-        fee: [],
-        memo: [],
-        from_subaccount: [],
-        created_at_time: [],
-        amount: BigNumber(amtSell).minus(fee).toNumber(),
-      });
-    } else if (sellTokenType === 'ICRC2') {
-      let icrc2 = await artemisWalletAdapter.getCanisterActor(sellToken, icrcIdlFactory, false);
-      fee = icrc2.icrc1_fee();
-      const tx = await icrc2.icrc2_approve({
-        fee: [],
-        memo: [],
-        from_subaccount: [],
-        created_at_time: [],
-        expected_allowance: [],
-        expires_at: [],
-        amount: BigNumber(amtSell).minus(fee).toNumber(),
-        spender: { owner: Principal.fromText(canistersIDs.APPIC_MULTISWAP), subaccount: [] },
-      });
-    } else if (sellTokenType === 'YC' || sellTokenType === 'DIP20') {
-      let dip20 = await artemisWalletAdapter.getCanisterActor(sellToken, dip20IdleFactory, false);
-      fee = dip20.getTokenFee();
-      const tx = await dip20.approve(Principal.fromText(canistersIDs.APPIC_MULTISWAP), BigNumber(amtSell).minus(fee).toNumber());
-    }
-    let sendMultiTras = await AppicActor.sonicSwap(
-      Principal.fromText(sellToken),
-      Principal.fromText(buyToken),
-      sellTokenType,
-      buyTokenType,
-      BigNumber(amtSell).minus(fee).toNumber()
-    );
-    console.log(sendMultiTras);
-    return sendMultiTras;
-  }
-}
-async function swapWithICPswap(sellToken, buyToken, sellTokenType, buyTokenType, amtSell) {
-  let amountOut = await icpSwapAmountOut(sellToken, buyToken, amtSell);
-  if (amountOut != 0) {
-    let AppicActor = await artemisWalletAdapter.getCanisterActor(canistersIDs.APPIC_MULTISWAP, AppicMultiswapidlFactory, false);
-    let caller = Principal.fromText(principalID);
-    let fee;
-    const subAccount = await AppicActor.getICRC1SubAccount(caller);
-    console.log('subAccount', subAccount);
-    if (sellTokenType === 'ICRC1') {
-      let icrc1 = await artemisWalletAdapter.getCanisterActor(sellToken, icrcIdlFactory, false);
-      fee = icrc1.icrc1_fee();
-      const tx = await icrc1.icrc1_transfer({
-        to: {
-          owner: Principal.fromText(canistersIDs.APPIC_MULTISWAP),
-          subaccount: [subAccount],
-        },
-        fee: [],
-        memo: [],
-        from_subaccount: [],
-        created_at_time: [],
-        amount: BigNumber(amtSell).minus(fee).toNumber(),
-      });
-    } else if (sellTokenType === 'ICRC2') {
-      let icrc2 = await artemisWalletAdapter.getCanisterActor(sellToken, icrcIdlFactory, false);
-      fee = icrc2.icrc1_fee();
-      const tx = await icrc2.icrc2_approve({
-        fee: [],
-        memo: [],
-        from_subaccount: [],
-        created_at_time: [],
-        expected_allowance: [],
-        expires_at: [],
-        amount: BigNumber(amtSell).minus(fee).toNumber(),
-        spender: { owner: Principal.fromText(canistersIDs.APPIC_MULTISWAP), subaccount: [] },
-      });
-    } else if (sellTokenType === 'YC' || sellTokenType === 'DIP20') {
-      let dip20 = await artemisWalletAdapter.getCanisterActor(sellToken, dip20IdleFactory, false);
-      fee = dip20.getTokenFee();
-      const tx = await dip20.approve(Principal.fromText(canistersIDs.APPIC_MULTISWAP), BigNumber(amtSell).minus(fee).toNumber());
-    }
-    let sendMultiTras = await AppicActor.icpSwap(
-      Principal.fromText(sellToken),
-      Principal.fromText(buyToken),
-      sellTokenType,
-      buyTokenType,
-      BigNumber(amtSell).minus(fee).toNumber()
-    );
-    console.log(sendMultiTras);
-    return sendMultiTras;
-  }
-}
-async function comparisionSwap(sellToken, buyToken, sellTokenType, buyTokenType, amtSell) {
-  let amountOut0 = await icpSwapAmountOut(sellToken, buyToken, amtSell);
-  let amountOut1 = await sonicSwapAmountOut(sellToken, buyToken, amtSell);
-  if (amountOut1 != 0 && amountOut0 != 0) {
-    let AppicActor = await artemisWalletAdapter.getCanisterActor(canistersIDs.APPIC_MULTISWAP, AppicMultiswapidlFactory, false);
-    let caller = Principal.fromText(principalID);
-    let fee;
-    const subAccount = await AppicActor.getICRC1SubAccount(caller);
-    console.log('subAccount', subAccount);
-    if (sellTokenType === 'ICRC1') {
-      let icrc1 = await artemisWalletAdapter.getCanisterActor(sellToken, icrcIdlFactory, false);
-      fee = icrc1.icrc1_fee();
-      const tx = await icrc1.icrc1_transfer({
-        to: {
-          owner: Principal.fromText(canistersIDs.APPIC_MULTISWAP),
-          subaccount: [subAccount],
-        },
-        fee: [],
-        memo: [],
-        from_subaccount: [],
-        created_at_time: [],
-        amount: BigNumber(amtSell).minus(fee).toNumber(),
-      });
-    } else if (sellTokenType === 'ICRC2') {
-      let icrc2 = await artemisWalletAdapter.getCanisterActor(sellToken, icrcIdlFactory, false);
-      fee = icrc2.icrc1_fee();
-      const tx = await icrc2.icrc2_approve({
-        fee: [],
-        memo: [],
-        from_subaccount: [],
-        created_at_time: [],
-        expected_allowance: [],
-        expires_at: [],
-        amount: BigNumber(amtSell).minus(fee).toNumber(),
-        spender: { owner: Principal.fromText(canistersIDs.APPIC_MULTISWAP), subaccount: [] },
-      });
-    } else if (sellTokenType === 'YC' || sellTokenType === 'DIP20') {
-      let dip20 = await artemisWalletAdapter.getCanisterActor(sellToken, dip20IdleFactory, false);
-      fee = dip20.getTokenFee();
-      const tx = await dip20.approve(Principal.fromText(canistersIDs.APPIC_MULTISWAP), BigNumber(amtSell).minus(fee).toNumber());
-    }
-    let sendMultiTras = await AppicActor.singleComparedSwap(
-      Principal.fromText(sellToken),
-      Principal.fromText(buyToken),
-      sellTokenType,
-      buyTokenType,
-      BigNumber(amtSell).minus(fee).toNumber()
-    );
-    console.log(sendMultiTras);
-    return sendMultiTras;
-  }
-}
-async function swapWithMidToken(sellToken, buyToken, sellTokenType, buyTokenType, amtSell) {
-  let amountOut00 = await icpSwapAmountOut(sellToken, canistersIDs.NNS_ICP_LEDGER, amtSell);
-  let amountOut01 = await icpSwapAmountOut(canistersIDs.NNS_ICP_LEDGER, buyToken, amountOut00);
-  let amountOut10 = await sonicSwapAmountOut(sellToken, canistersIDs.NNS_ICP_LEDGER, amtSell);
-  let amountOut11 = await sonicSwapAmountOut(canistersIDs.NNS_ICP_LEDGER, buyToken, amountOut10);
-  if (amountOut11 != 0 && amountOut01 != 0) {
-    let midToken = Principal.fromText(canistersIDs.NNS_ICP_LEDGER);
-    let AppicActor = await artemisWalletAdapter.getCanisterActor(canistersIDs.APPIC_MULTISWAP, AppicMultiswapidlFactory, false);
-    let caller = Principal.fromText(principalID);
-    let fee;
-    const subAccount = await AppicActor.getICRC1SubAccount(caller);
-    console.log('subAccount', subAccount);
-    if (sellTokenType === 'ICRC1') {
-      let icrc1 = await artemisWalletAdapter.getCanisterActor(sellToken, icrcIdlFactory, false);
-      fee = icrc1.icrc1_fee();
-      const tx = await icrc1.icrc1_transfer({
-        to: {
-          owner: Principal.fromText(canistersIDs.APPIC_MULTISWAP),
-          subaccount: [subAccount],
-        },
-        fee: [],
-        memo: [],
-        from_subaccount: [],
-        created_at_time: [],
-        amount: BigNumber(amtSell).minus(fee).toNumber(),
-      });
-    } else if (sellTokenType === 'ICRC2') {
-      let icrc2 = await artemisWalletAdapter.getCanisterActor(sellToken, icrcIdlFactory, false);
-      fee = icrc2.icrc1_fee();
-      const tx = await icrc2.icrc2_approve({
-        fee: [],
-        memo: [],
-        from_subaccount: [],
-        created_at_time: [],
-        expected_allowance: [],
-        expires_at: [],
-        amount: BigNumber(amtSell).minus(fee).toNumber(),
-        spender: { owner: Principal.fromText(canistersIDs.APPIC_MULTISWAP), subaccount: [] },
-      });
-    } else if (sellTokenType === 'YC' || sellTokenType === 'DIP20') {
-      let dip20 = await artemisWalletAdapter.getCanisterActor(sellToken, dip20IdleFactory, false);
-      fee = dip20.getTokenFee();
-      const tx = await dip20.approve(Principal.fromText(canistersIDs.APPIC_MULTISWAP), BigNumber(amtSell).minus(fee).toNumber());
-    }
-    let sendMultiTras = await AppicActor.swapWithMidToken(
-      Principal.fromText(sellToken),
-      midToken,
-      Principal.fromText(buyToken),
-      BigNumber(amtSell).minus(fee).toNumber(),
-      sellTokenType,
-      'ICRC2',
-      buyTokenType
-    );
-    console.log(sendMultiTras);
-    return sendMultiTras;
-  }
-}
-
-function Swap(props) {
+function Swap() {
   const [tokenModal, setTokenModal] = useState({ isActive: false, modalType: 'sell', tokens: [] }); // modalType: buy, sell
   const [swapData, setSwapData] = useState({
     sellToken: {
@@ -286,6 +72,218 @@ function Swap(props) {
     }
     setTokenModal({ ...tokenModal, isActive: false });
   };
+
+  async function swapWithSonic(sellToken, buyToken, sellTokenType, buyTokenType, amtSell) {
+    let amountOut = await sonicSwapAmountOut(sellToken, buyToken, amtSell);
+    if (amountOut != 0) {
+      let AppicActor = await artemisWalletAdapter.getCanisterActor(canistersIDs.APPIC_MULTISWAP, AppicMultiswapidlFactory, false);
+      let caller = Principal.fromText(principalID);
+      let fee;
+      const subAccount = await AppicActor.getICRC1SubAccount(caller);
+      console.log('subAccount', subAccount);
+      if (sellTokenType === 'ICRC1') {
+        let icrc1 = await artemisWalletAdapter.getCanisterActor(sellToken, icrcIdlFactory, false);
+        fee = icrc1.icrc1_fee();
+        const tx = await icrc1.icrc1_transfer({
+          to: {
+            owner: Principal.fromText(canistersIDs.APPIC_MULTISWAP),
+            subaccount: [subAccount],
+          },
+          fee: [],
+          memo: [],
+          from_subaccount: [],
+          created_at_time: [],
+          amount: BigNumber(amtSell).minus(fee).toNumber(),
+        });
+      } else if (sellTokenType === 'ICRC2') {
+        let icrc2 = await artemisWalletAdapter.getCanisterActor(sellToken, icrcIdlFactory, false);
+        fee = icrc2.icrc1_fee();
+        const tx = await icrc2.icrc2_approve({
+          fee: [],
+          memo: [],
+          from_subaccount: [],
+          created_at_time: [],
+          expected_allowance: [],
+          expires_at: [],
+          amount: BigNumber(amtSell).minus(fee).toNumber(),
+          spender: { owner: Principal.fromText(canistersIDs.APPIC_MULTISWAP), subaccount: [] },
+        });
+      } else if (sellTokenType === 'YC' || sellTokenType === 'DIP20') {
+        let dip20 = await artemisWalletAdapter.getCanisterActor(sellToken, dip20IdleFactory, false);
+        fee = dip20.getTokenFee();
+        const tx = await dip20.approve(Principal.fromText(canistersIDs.APPIC_MULTISWAP), BigNumber(amtSell).minus(fee).toNumber());
+      }
+      let sendMultiTras = await AppicActor.sonicSwap(
+        Principal.fromText(sellToken),
+        Principal.fromText(buyToken),
+        sellTokenType,
+        buyTokenType,
+        BigNumber(amtSell).minus(fee).toNumber()
+      );
+      console.log(sendMultiTras);
+      return sendMultiTras;
+    }
+  }
+  async function swapWithICPswap(sellToken, buyToken, sellTokenType, buyTokenType, amtSell) {
+    let amountOut = await icpSwapAmountOut(sellToken, buyToken, amtSell);
+    if (amountOut != 0) {
+      let AppicActor = await artemisWalletAdapter.getCanisterActor(canistersIDs.APPIC_MULTISWAP, AppicMultiswapidlFactory, false);
+      let caller = Principal.fromText(principalID);
+      let fee;
+      const subAccount = await AppicActor.getICRC1SubAccount(caller);
+      console.log('subAccount', subAccount);
+      if (sellTokenType === 'ICRC1') {
+        let icrc1 = await artemisWalletAdapter.getCanisterActor(sellToken, icrcIdlFactory, false);
+        fee = icrc1.icrc1_fee();
+        const tx = await icrc1.icrc1_transfer({
+          to: {
+            owner: Principal.fromText(canistersIDs.APPIC_MULTISWAP),
+            subaccount: [subAccount],
+          },
+          fee: [],
+          memo: [],
+          from_subaccount: [],
+          created_at_time: [],
+          amount: BigNumber(amtSell).minus(fee).toNumber(),
+        });
+      } else if (sellTokenType === 'ICRC2') {
+        let icrc2 = await artemisWalletAdapter.getCanisterActor(sellToken, icrcIdlFactory, false);
+        fee = icrc2.icrc1_fee();
+        const tx = await icrc2.icrc2_approve({
+          fee: [],
+          memo: [],
+          from_subaccount: [],
+          created_at_time: [],
+          expected_allowance: [],
+          expires_at: [],
+          amount: BigNumber(amtSell).minus(fee).toNumber(),
+          spender: { owner: Principal.fromText(canistersIDs.APPIC_MULTISWAP), subaccount: [] },
+        });
+      } else if (sellTokenType === 'YC' || sellTokenType === 'DIP20') {
+        let dip20 = await artemisWalletAdapter.getCanisterActor(sellToken, dip20IdleFactory, false);
+        fee = dip20.getTokenFee();
+        const tx = await dip20.approve(Principal.fromText(canistersIDs.APPIC_MULTISWAP), BigNumber(amtSell).minus(fee).toNumber());
+      }
+      let sendMultiTras = await AppicActor.icpSwap(
+        Principal.fromText(sellToken),
+        Principal.fromText(buyToken),
+        sellTokenType,
+        buyTokenType,
+        BigNumber(amtSell).minus(fee).toNumber()
+      );
+      console.log(sendMultiTras);
+      return sendMultiTras;
+    }
+  }
+  async function comparisionSwap(sellToken, buyToken, sellTokenType, buyTokenType, amtSell) {
+    let amountOut0 = await icpSwapAmountOut(sellToken, buyToken, amtSell);
+    let amountOut1 = await sonicSwapAmountOut(sellToken, buyToken, amtSell);
+    if (amountOut1 != 0 && amountOut0 != 0) {
+      let AppicActor = await artemisWalletAdapter.getCanisterActor(canistersIDs.APPIC_MULTISWAP, AppicMultiswapidlFactory, false);
+      let caller = Principal.fromText(principalID);
+      let fee;
+      const subAccount = await AppicActor.getICRC1SubAccount(caller);
+      console.log('subAccount', subAccount);
+      if (sellTokenType === 'ICRC1') {
+        let icrc1 = await artemisWalletAdapter.getCanisterActor(sellToken, icrcIdlFactory, false);
+        fee = icrc1.icrc1_fee();
+        const tx = await icrc1.icrc1_transfer({
+          to: {
+            owner: Principal.fromText(canistersIDs.APPIC_MULTISWAP),
+            subaccount: [subAccount],
+          },
+          fee: [],
+          memo: [],
+          from_subaccount: [],
+          created_at_time: [],
+          amount: BigNumber(amtSell).minus(fee).toNumber(),
+        });
+      } else if (sellTokenType === 'ICRC2') {
+        let icrc2 = await artemisWalletAdapter.getCanisterActor(sellToken, icrcIdlFactory, false);
+        fee = icrc2.icrc1_fee();
+        const tx = await icrc2.icrc2_approve({
+          fee: [],
+          memo: [],
+          from_subaccount: [],
+          created_at_time: [],
+          expected_allowance: [],
+          expires_at: [],
+          amount: BigNumber(amtSell).minus(fee).toNumber(),
+          spender: { owner: Principal.fromText(canistersIDs.APPIC_MULTISWAP), subaccount: [] },
+        });
+      } else if (sellTokenType === 'YC' || sellTokenType === 'DIP20') {
+        let dip20 = await artemisWalletAdapter.getCanisterActor(sellToken, dip20IdleFactory, false);
+        fee = dip20.getTokenFee();
+        const tx = await dip20.approve(Principal.fromText(canistersIDs.APPIC_MULTISWAP), BigNumber(amtSell).minus(fee).toNumber());
+      }
+      let sendMultiTras = await AppicActor.singleComparedSwap(
+        Principal.fromText(sellToken),
+        Principal.fromText(buyToken),
+        sellTokenType,
+        buyTokenType,
+        BigNumber(amtSell).minus(fee).toNumber()
+      );
+      console.log(sendMultiTras);
+      return sendMultiTras;
+    }
+  }
+  async function swapWithMidToken(sellToken, buyToken, sellTokenType, buyTokenType, amtSell) {
+    let amountOut00 = await icpSwapAmountOut(sellToken, canistersIDs.NNS_ICP_LEDGER, amtSell);
+    let amountOut01 = await icpSwapAmountOut(canistersIDs.NNS_ICP_LEDGER, buyToken, amountOut00);
+    let amountOut10 = await sonicSwapAmountOut(sellToken, canistersIDs.NNS_ICP_LEDGER, amtSell);
+    let amountOut11 = await sonicSwapAmountOut(canistersIDs.NNS_ICP_LEDGER, buyToken, amountOut10);
+    if (amountOut11 != 0 && amountOut01 != 0) {
+      let midToken = Principal.fromText(canistersIDs.NNS_ICP_LEDGER);
+      let AppicActor = await artemisWalletAdapter.getCanisterActor(canistersIDs.APPIC_MULTISWAP, AppicMultiswapidlFactory, false);
+      let caller = Principal.fromText(principalID);
+      let fee;
+      const subAccount = await AppicActor.getICRC1SubAccount(caller);
+      console.log('subAccount', subAccount);
+      if (sellTokenType === 'ICRC1') {
+        let icrc1 = await artemisWalletAdapter.getCanisterActor(sellToken, icrcIdlFactory, false);
+        fee = icrc1.icrc1_fee();
+        const tx = await icrc1.icrc1_transfer({
+          to: {
+            owner: Principal.fromText(canistersIDs.APPIC_MULTISWAP),
+            subaccount: [subAccount],
+          },
+          fee: [],
+          memo: [],
+          from_subaccount: [],
+          created_at_time: [],
+          amount: BigNumber(amtSell).minus(fee).toNumber(),
+        });
+      } else if (sellTokenType === 'ICRC2') {
+        let icrc2 = await artemisWalletAdapter.getCanisterActor(sellToken, icrcIdlFactory, false);
+        fee = icrc2.icrc1_fee();
+        const tx = await icrc2.icrc2_approve({
+          fee: [],
+          memo: [],
+          from_subaccount: [],
+          created_at_time: [],
+          expected_allowance: [],
+          expires_at: [],
+          amount: BigNumber(amtSell).minus(fee).toNumber(),
+          spender: { owner: Principal.fromText(canistersIDs.APPIC_MULTISWAP), subaccount: [] },
+        });
+      } else if (sellTokenType === 'YC' || sellTokenType === 'DIP20') {
+        let dip20 = await artemisWalletAdapter.getCanisterActor(sellToken, dip20IdleFactory, false);
+        fee = dip20.getTokenFee();
+        const tx = await dip20.approve(Principal.fromText(canistersIDs.APPIC_MULTISWAP), BigNumber(amtSell).minus(fee).toNumber());
+      }
+      let sendMultiTras = await AppicActor.swapWithMidToken(
+        Principal.fromText(sellToken),
+        midToken,
+        Principal.fromText(buyToken),
+        BigNumber(amtSell).minus(fee).toNumber(),
+        sellTokenType,
+        'ICRC2',
+        buyTokenType
+      );
+      console.log(sendMultiTras);
+      return sendMultiTras;
+    }
+  }
 
   return (
     <>
@@ -363,9 +361,25 @@ function Swap(props) {
                 </div>
               </div>
               <button
-                onClick={() => {
-                  console.log(isComparisonActive);
+                onClick={async () => {
                   setIsComparisonActive(!isComparisonActive);
+
+                  console.log(
+                    await icpSwapAmountOut(
+                      swapData.sellToken.id,
+                      swapData.sellToken.tokenType,
+                      swapData.buyToken.id,
+                      swapData.buyToken.tokenType,
+                      swapData.amountToSell
+                    )
+                  );
+                  console.log(
+                    swapData.sellToken.id,
+                    swapData.sellToken.tokenType,
+                    swapData.buyToken.id,
+                    swapData.buyToken.tokenType,
+                    swapData.amountToSell
+                  );
                 }}
                 className="swap_btn"
               >
