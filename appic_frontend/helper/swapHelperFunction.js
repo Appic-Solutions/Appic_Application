@@ -1,4 +1,4 @@
-import { icpSwapPools, icpSwapFactory, sonicIdlFactory } from '@/did';
+import { icpSwapPools, icpSwapFactory, sonicIdlFactory, AppicMultiswapidlFactory } from '@/did';
 import canistersIDs from '@/config/canistersIDs';
 import { artemisWalletAdapter } from '@/utils/walletConnector';
 
