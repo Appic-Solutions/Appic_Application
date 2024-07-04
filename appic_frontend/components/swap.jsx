@@ -31,6 +31,7 @@ function Swap(props) {
       logo: '/blankToken.png',
     },
     amountToSell: 0,
+    swpaPairs: [],
   });
   const [tokenContractToShow, setTokenContractToShow] = useState('');
   const [isComparisonActive, setIsComparisonActive] = useState(false);
@@ -71,6 +72,65 @@ function Swap(props) {
       setSwapData({ ...swapData, sellToken: token });
     }
     setTokenModal({ ...tokenModal, isActive: false });
+  };
+
+  // Get Dex logo
+  const getDexLogo = (dex) => {
+    switch (dex) {
+      case 'ICPSwap':
+        return 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAADMklEQVR4AbXVAURccQDH8afurta6UtsuS7SmuiZVA5JQRqqoKJElKChAAIKkVZEL5EIKQJFI28ZaykpVQVCrqZipu3ZQdrvuqt9+/8c91b137j3Xlw89f++99/q///8kHSXTe5qgLTonP12Rm9bJSc2USFHrDU3RP0KELslJWWS4J+SgAMEgH/WRmXSVTpuEKPlONoqot/SbEGVHZKewvaRfhEdyTC/CzfkG4ZGtkIVCchCMyMvLw8zMDNxuNy4uLrC6uor29nbExsZqndOjstSMfe1tbW3w+/1Qa35+HhaLRe08L6WT0hRBr7KyMlxfX0O0vb2Njo4OtLa2YnZ2FsEGBwe1zh8huSTyEvRaWlqCaG1tDXFxcffGHA4HRF6vF4mJiWrneyiOpFaCXqmpqcrb19TUhIzbbDYEq6io0LpOFUkTBL3ERZk8/yaTKWQ8Pj4egUBA4wEVwyRtEfSqq6uDyOVyqY43NjYiWFZWltZ1PpP0hxCJpKQkZGZmyvNdWloKEd9S/g+kpKSIuZb/rq+vx/n5OUSLi4vhrnlAkp8QTmVlJdbX13F7ewuR0+kUN1SOCwsLUVJSIn8TPp8PwTweD3JycsJd20XSFUFLZ2dn8EZKKysr8tjJyQmYvBckJyfjbsvLy8jNzQ37YnRGkpugJj8/X/mQdnZ2UFtbi4KCAjQ1NcnjCwsLEPX398vH1dXVaGhoUL+xun3S3v/HxsYgOj4+htVqDRkXU8HkbZjHRnwkyUlQs7GxAdHQ0JDq+OTkJERzc3NGH+ADSc0ENZubmxANDAyojosPUzQ6Omr0Ad6R9JQuCQ+Nj49DdHh4iISEhHtjxcXFyk7Ib8PIzV1kIqYxDUVFRbi5uQGTf2LLy8uRkZGBlpYWnJ6eQrS3t4eYmBgjD9BLSq/JR3iou7s7ZBneXedcFUZufkZWuldfuG13d3cXTNn/p6enkZ2dbXTuuygkM30jaElLS4PdbofZbBbHRi1RLKn2nI4Ij+SAbBQ2O/0kRNkhvaKIeqY+HYZ9JRvpykw99JdgkIu6KIYMl04j5NG5zHrJSlHLQlU0TF/oB7nJRfv0ifrpHZkoov4DbvZk8gNd6AQAAAAASUVORK5CYII=';
+
+      case 'SonicSwap':
+        return 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABwAAAAcCAMAAABF0y+mAAAAMFBMVEUADQEPPSgADQEQPioACQACKxcAEAEINiEAIQ4AFwYN6aAAAAAB/ZEEvHEDYTsFkFpBcIP4AAAABHRSTlPk5CYmVbbOUAAAAMhJREFUKJF90IsOgzAIQFF8AEVs/f+/XUuhutnsGhPjETTCCvsrsmCFt5GjTGxMisyWOtIMfVL+Tk7xNaneDJWLxXovDlQ8PY1BCVQNY31u7ZPZ7dLRQL2yV0pcabUEbcX9sZrPw7q0odBoJy1uRyFJFVuuymF1MDVMEr6T05HNEqRQkT0HmiFCsuwJzU9riKH1pP4T0a1iLaFP24spjA2r+oIR3oj3/CBkBmZGHupHN8MW/mQ3Ax8LhjEs/Azt8BbYvrU/0W37AJ26FYpy4y15AAAAAElFTkSuQmCC';
+    }
+  };
+
+  // Get the return amount from different dexs
+  const getReturnAmount = async () => {
+    if (swapData.buyToken.symbol == 'ABC' || swapData.sellToken.symbol == 'XYZ') {
+      return;
+    }
+
+    // get the return amount for icpswap
+    let icpswapResult = await icpSwapAmountOut(
+      swapData.sellToken.id,
+      'ICRC1',
+      swapData.buyToken.id,
+      'ICRC1',
+      BigNumber(swapData.amountToSell)
+        .multipliedBy(10 ** swapData.sellToken.decimals)
+        .toNumber()
+    );
+
+    // get the retuen amount for sonic
+    let sonicResult = await sonicSwapAmountOut(
+      swapData.sellToken.id,
+      swapData.buyToken.id,
+      BigNumber(swapData.amountToSell)
+        .multipliedBy(10 ** swapData.sellToken.decimals)
+        .toNumber()
+    );
+
+    // remove the decimnals
+    let transformedICPSwapResult = BigNumber(icpswapResult)
+      .dividedBy(10 ** swapData.buyToken.decimals)
+      .toNumber();
+    let transformedSonicResult = BigNumber(sonicResult)
+      .dividedBy(10 ** swapData.buyToken.decimals)
+      .toNumber();
+
+    // calculate the usd price
+    let ICPSwapUSD = BigNumber(transformedICPSwapResult).multipliedBy(swapData.buyToken.price).toNumber();
+    let sonicUSD = BigNumber(transformedSonicResult).multipliedBy(swapData.buyToken.price).toNumber();
+
+    let dexsObject = [
+      { dex: 'ICPSwap', amountOut: transformedICPSwapResult, usdValue: ICPSwapUSD, selected: false },
+      { dex: 'SonicSwap', amountOut: transformedSonicResult, usdValue: sonicUSD, selected: false },
+    ].sort((a, b) => b.amountOut - a.amountOut);
+
+    dexsObject[0].selected = true;
+
+    setSwapData({ ...swapData, swpaPairs: dexsObject });
   };
 
   /**
@@ -462,6 +522,7 @@ function Swap(props) {
                     <input
                       onChange={(e) => {
                         console.log(swapData);
+
                         setSwapData({ ...swapData, amountToSell: e.target.value });
                       }}
                       value={swapData.amountToSell}
@@ -484,111 +545,67 @@ function Swap(props) {
                 </div>
               </div>
               <button
+                disabled={swapData.buyToken.symbol == 'ABC' || swapData.sellToken.symbol == 'XYZ'}
                 onClick={async () => {
                   setIsComparisonActive(!isComparisonActive);
 
-                  console.log(
-                    await icpSwapAmountOut(
-                      swapData.sellToken.id,
-                      swapData.sellToken.tokenType,
-                      swapData.buyToken.id,
-                      swapData.buyToken.tokenType,
-                      swapData.amountToSell
-                    )
-                  );
-                  console.log(
-                    swapData.sellToken.id,
-                    swapData.sellToken.tokenType,
-                    swapData.buyToken.id,
-                    swapData.buyToken.tokenType,
-                    swapData.amountToSell
-                  );
+                  console.log(await getReturnAmount());
                 }}
                 className="swap_btn"
               >
-                Review Swap
+                {(swapData.buyToken.symbol == 'ABC' || swapData.sellToken.symbol == 'XYZ') && 'Select tokens'}Review Swap
               </button>
             </div>
             <div className={isComparisonActive ? 'swap__routes active' : 'swap__routes'}>
               <div className="swapAndTimer">
                 <h2 className="title">Select Route</h2>
-                <Countdown onCountdownComplete={() => {}} />
+                <Countdown
+                  onCountdownComplete={async () => {
+                    setSwapData({ ...swapData, swpaPairs: [] });
+                    await getReturnAmount();
+                  }}
+                />
               </div>
 
               <div className="dexs">
-                <div className="dex selected">
-                  <p className="badge">Best Return</p>
-                  <div className="return__details">
-                    <img src="/ckBTC.png" alt="" />
-                    <div className="returnDetails">
-                      <h3 className="amount">1.0324 ckBTC</h3>
-                      <div className="dexAndusdPrice">
-                        <p>$1.545</p>
-                        <div className="dexDetails">
-                          <img
-                            src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAACF0lEQVR4AWJAB2xsbEZAajofH99Nfn7+n0Aa0DYZQKoVR2FcVaoqKqgSEoB5HhAGbKwJDIRhEBhWGAQEAIzkuZ6ZASiRlARDG0BRKRMqqUpCBFd0+3a+ybXuOny693/P+Z1zzv90kvcJz0SPovsWiURcgUDgmzxqXq8XNpsNAoC8/yuNIOYxxjtisdgvBuXzefR6PXS7Xbx5/RFWq8sIoX7cQCTzM7OVy2XQdrsdFosFPn/q4NXL7/cAkFYVxtIew+GwlkgkQGu1WpLVyhbw4f0XvHv78y5A2tRCodADAYr0j0wmA1o6ndadGo0Gvj63/wu2WCzweDyQxAoBEwKSySRopVIJZrMZdKzVathsNlBVFfP5HLlcDna7HWyXPsFgcELASR7YE/r9Pi6XC9rtNiqVCobDIVarFVjJbDYDrVAoEE4Iqzj9BfDa5L5ZEur1Os7nMzRNw2AwwHK5BAOcTidGoxGOxyOD4XA4GKMSwIW5uXN+lJtBs9nUAVSxWAQtHo+zYsZMCFBMJhNp8Pv9N8PiDNbrNQiPRqOYTqc4HA6cA/2ZRCGA66kxq9vths/ngwB1AGfQ6XSw3W5B46IRKABN2tJXmyS4XC4KnAmVSqVQrVax3+8xHo+RzWY5CwL4+3TzH7quJ3sjnRPmfdORlXG5eE4ZV1k3q6jIdkRsQw9gVQRdvz0Zg4324ur0W6RexWeePRid/wCDN2DtFwT6ywAAAABJRU5ErkJggg=="
-                            alt=""
-                          />
-                          <p>IcpEx</p>
+                {swapData.swpaPairs == 0 && <LoadingComponent></LoadingComponent>}
+                {swapData.swpaPairs.map((pair, index) => {
+                  return (
+                    <div
+                      key={pair.dex}
+                      onClick={() => {
+                        let newPairsObject = swapData.swpaPairs.map((pair) => {
+                          pair.selected = false;
+                          return pair;
+                        });
+
+                        newPairsObject[index].selected = true;
+                        setSwapData({ ...swapData, swpaPairs: newPairsObject });
+                      }}
+                      className={pair.selected ? 'dex selected' : 'dex'}
+                    >
+                      <div className="badges">
+                        {index == 0 && <p className="badge">Best Return</p>}
+                        {pair.selected && <p className="badge">Selected</p>}
+                      </div>
+                      <div className="return__details">
+                        <img src={swapData.buyToken.logo} alt="" />
+                        <div className="returnDetails">
+                          <h3 className="amount">
+                            ~{formatSignificantNumber(pair.amountOut)} {swapData.buyToken.symbol}
+                          </h3>
+                          <div className="dexAndusdPrice">
+                            <p>$~{formatDecimalValue(pair.usdValue)}</p>
+                            <div className="dexDetails">
+                              <img src={getDexLogo(pair.dex)} alt="" />
+                              <p>{pair.dex}</p>
+                            </div>
+                          </div>
                         </div>
                       </div>
                     </div>
-                  </div>
-                </div>
-                <div className="dex">
-                  <div className="return__details">
-                    <img src="/ckBTC.png" alt="" />
-                    <div className="returnDetails">
-                      <h3 className="amount">1.0324 ckBTC</h3>
-                      <div className="dexAndusdPrice">
-                        <p>$1.545</p>
-                        <div className="dexDetails">
-                          <img
-                            src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAADMklEQVR4AbXVAURccQDH8afurta6UtsuS7SmuiZVA5JQRqqoKJElKChAAIKkVZEL5EIKQJFI28ZaykpVQVCrqZipu3ZQdrvuqt9+/8c91b137j3Xlw89f++99/q///8kHSXTe5qgLTonP12Rm9bJSc2USFHrDU3RP0KELslJWWS4J+SgAMEgH/WRmXSVTpuEKPlONoqot/SbEGVHZKewvaRfhEdyTC/CzfkG4ZGtkIVCchCMyMvLw8zMDNxuNy4uLrC6uor29nbExsZqndOjstSMfe1tbW3w+/1Qa35+HhaLRe08L6WT0hRBr7KyMlxfX0O0vb2Njo4OtLa2YnZ2FsEGBwe1zh8huSTyEvRaWlqCaG1tDXFxcffGHA4HRF6vF4mJiWrneyiOpFaCXqmpqcrb19TUhIzbbDYEq6io0LpOFUkTBL3ERZk8/yaTKWQ8Pj4egUBA4wEVwyRtEfSqq6uDyOVyqY43NjYiWFZWltZ1PpP0hxCJpKQkZGZmyvNdWloKEd9S/g+kpKSIuZb/rq+vx/n5OUSLi4vhrnlAkp8QTmVlJdbX13F7ewuR0+kUN1SOCwsLUVJSIn8TPp8PwTweD3JycsJd20XSFUFLZ2dn8EZKKysr8tjJyQmYvBckJyfjbsvLy8jNzQ37YnRGkpugJj8/X/mQdnZ2UFtbi4KCAjQ1NcnjCwsLEPX398vH1dXVaGhoUL+xun3S3v/HxsYgOj4+htVqDRkXU8HkbZjHRnwkyUlQs7GxAdHQ0JDq+OTkJERzc3NGH+ADSc0ENZubmxANDAyojosPUzQ6Omr0Ad6R9JQuCQ+Nj49DdHh4iISEhHtjxcXFyk7Ib8PIzV1kIqYxDUVFRbi5uQGTf2LLy8uRkZGBlpYWnJ6eQrS3t4eYmBgjD9BLSq/JR3iou7s7ZBneXedcFUZufkZWuldfuG13d3cXTNn/p6enkZ2dbXTuuygkM30jaElLS4PdbofZbBbHRi1RLKn2nI4Ij+SAbBQ2O/0kRNkhvaKIeqY+HYZ9JRvpykw99JdgkIu6KIYMl04j5NG5zHrJSlHLQlU0TF/oB7nJRfv0ifrpHZkoov4DbvZk8gNd6AQAAAAASUVORK5CYII="
-                            alt=""
-                          />
-                          <p>ICPSwap</p>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-                <div className="dex">
-                  <div className="return__details">
-                    <img src="/ckBTC.png" alt="" />
-                    <div className="returnDetails">
-                      <h3 className="amount">1.0324 ckBTC</h3>
-                      <div className="dexAndusdPrice">
-                        <p>$1.545</p>
-                        <div className="dexDetails">
-                          <img
-                            src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABwAAAAcCAMAAABF0y+mAAAAMFBMVEUADQEPPSgADQEQPioACQACKxcAEAEINiEAIQ4AFwYN6aAAAAAB/ZEEvHEDYTsFkFpBcIP4AAAABHRSTlPk5CYmVbbOUAAAAMhJREFUKJF90IsOgzAIQFF8AEVs/f+/XUuhutnsGhPjETTCCvsrsmCFt5GjTGxMisyWOtIMfVL+Tk7xNaneDJWLxXovDlQ8PY1BCVQNY31u7ZPZ7dLRQL2yV0pcabUEbcX9sZrPw7q0odBoJy1uRyFJFVuuymF1MDVMEr6T05HNEqRQkT0HmiFCsuwJzU9riKH1pP4T0a1iLaFP24spjA2r+oIR3oj3/CBkBmZGHupHN8MW/mQ3Ax8LhjEs/Azt8BbYvrU/0W37AJ26FYpy4y15AAAAAElFTkSuQmCC"
-                            alt=""
-                          />
-                          <p>Sonic</p>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-                <div className="dex">
-                  <div className="return__details">
-                    <img src="/ckBTC.png" alt="" />
-                    <div className="returnDetails">
-                      <h3 className="amount">1.0324 ckBTC</h3>
-                      <div className="dexAndusdPrice">
-                        <p>$1.545</p>
-                        <div className="dexDetails">
-                          <img
-                            src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABwAAAAcCAMAAABF0y+mAAAAOVBMVEVHcEwspuAspuAspuAspuAspuAspuAspuAspuAspuAspuAspuAspuAspuAspuAspuAspuAspuAspuB4KyaFAAAAE3RSTlMAVtSeIA49jLjDdy1pr1waS+b6HH8xuwAAAQFJREFUeAF10tGyAxEMBuBIRAQB7/+wp13VObuj/7jhy8gA/I9D8nAMB0KJmk6cRSkAl2i1PailaI6voqTU782ill3PQVDylzKhrE7dL46YeFWmYeGzwdS21gpqv1aGg5U651QPi0n91e/TrdELv5XObghlGOKe1CdiSz/R2WvwETmH/h6ZD9hxII45Yj4gOOuEZu3YsyNSqz+wYuGq0R+xUKAolo+YUMWHeMO6UbRDUAy36xtlnVMKyxDr66JN/X6eCyPG1sy9KY342cELUgYmLJBpVOCuWhl2umkKVFtRshT2x9jhEhWFrLOgUoBHfMJpnhNa5+PPRVKtDc4JKjf6A3JMDEmVDDq0AAAAAElFTkSuQmCC"
-                            alt=""
-                          />
-                          <p>ICDex</p>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
+                  );
+                })}
               </div>
             </div>
           </div>

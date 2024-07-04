@@ -152,22 +152,6 @@
               text-align: right;
             }
           }
-          // .input_container {
-          //   width: 100%;
-          //
-
-          // }
-          // .balancecontainer {
-          //   display: flex;
-          //   flex-direction: column;
-          //   button {
-          //
-          //   }
-          //   span {
-          //     font-size: 1rem;
-          //     font-weight: 500;
-          //   }
-          // }
         }
 
         .swap_btn {
@@ -181,6 +165,10 @@
           font-size: 1.6rem;
           font-size: 600;
           cursor: pointer;
+          &:disabled {
+            cursor: unset;
+            background-color: #8c6c91;
+          }
         }
       }
     }
@@ -213,7 +201,11 @@
           border: 1px solid $light-border;
           padding: 1rem;
           border-radius: 20px;
-
+          .badges {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+          }
           .badge {
             margin-bottom: 1rem;
             padding: 0.6rem 1rem;
@@ -231,6 +223,7 @@
             img {
               width: 45px;
               height: 45px;
+              border-radius: 50%;
             }
             .returnDetails {
               display: flex;
@@ -370,6 +363,10 @@
 
           .swap_btn {
             background-color: $dark-secondary;
+            &:disabled {
+              cursor: unset;
+              background-color: #8c6c91;
+            }
           }
         }
         .swap__routes {

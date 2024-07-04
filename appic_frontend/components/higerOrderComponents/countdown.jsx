@@ -1,12 +1,12 @@
 import React, { useState, useEffect } from 'react';
 
 const Countdown = ({ onCountdownComplete }) => {
-  const [timeLeft, setTimeLeft] = useState(20);
+  const [timeLeft, setTimeLeft] = useState(30);
 
   useEffect(() => {
     if (timeLeft === 0) {
       onCountdownComplete();
-      setTimeLeft(20);
+      setTimeLeft(30);
       return;
     }
 
@@ -20,7 +20,7 @@ const Countdown = ({ onCountdownComplete }) => {
   const circumference = 2 * Math.PI * 13.5;
   const circleStyle = {
     strokeDasharray: circumference,
-    strokeDashoffset: `${(circumference * (20 - timeLeft)) / 20}`,
+    strokeDashoffset: `${(circumference * (30 - timeLeft)) / 30}`,
   };
 
   return (

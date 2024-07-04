@@ -1,6 +1,7 @@
 import { icpSwapPools, icpSwapFactory, sonicIdlFactory } from '@/did';
 import canistersIDs from '@/config/canistersIDs';
 import { artemisWalletAdapter } from '@/utils/walletConnector';
+import { Principal } from '@dfinity/principal';
 
 /**
  * @notice This function gets the amount of token1 that can be obtained for a given amount of token0 using the ICPswap platform.
