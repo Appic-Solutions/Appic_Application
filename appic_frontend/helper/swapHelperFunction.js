@@ -114,6 +114,14 @@ async function sonicSwapAmountOut(t0, t1, amountIn) {
   }
 }
 
+async function getTxHistory(userAddress) {
+  // Create an actor to interact with the APPIC multiswap canister.
+  let AppicActor = await artemisWalletAdapter.getCanisterActor(canistersIDs.APPIC_MULTISWAP, AppicMultiswapidlFactory, false);
+  // get the the history.
+  let history = await AppicActor.getUserHistory(userAddress);
+  console.log(history);
+  return history;
+}
 // Export the functions
-export { icpSwapAmountOut, sonicSwapAmountOut };
+export { icpSwapAmountOut, sonicSwapAmountOut, getTxHistory };
 
