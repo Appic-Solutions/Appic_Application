@@ -74,34 +74,28 @@ export const AppicMultiswapidlFactory = ({ IDL }) => {
     ICRC1TokenActor: ICRC1TokenActor,
     ICRC2TokenActor: ICRC2TokenActor,
   });
+  const TxHistory = IDL.Record({
+    n1: IDL.Nat,
+    n2: IDL.Nat,
+    p2: IDL.Text,
+    p3: IDL.Text,
+    time: IDL.Int,
+  });
   return IDL.Service({
     _getTokenActorWithType: IDL.Func([IDL.Text, IDL.Text], [TokenActorVariable], ['query']),
-    _transfer: IDL.Func([IDL.Text, IDL.Text, IDL.Principal, IDL.Nat], [TransferReceipt], []),
-    _transferFrom: IDL.Func([IDL.Text, IDL.Text, IDL.Principal, IDL.Nat], [TransferReceipt], []),
     changeFee: IDL.Func([IDL.Nat], [], []),
     changeOwner: IDL.Func([IDL.Principal], [], []),
     getICRC1SubAccount: IDL.Func([IDL.Principal], [Subaccount], ['query']),
+    getTxNumber: IDL.Func([], [IDL.Nat], ['query']),
+    getUserHistory: IDL.Func([IDL.Text], [IDL.Vec(TxHistory)], ['query']),
+    getUserPrincipal: IDL.Func([], [IDL.Vec(IDL.Text)], ['query']),
     icpSwap: IDL.Func([IDL.Principal, IDL.Principal, IDL.Text, IDL.Text, IDL.Nat], [IDL.Nat], []),
     icpSwapAmountOut: IDL.Func([IDL.Text, IDL.Text, IDL.Text, IDL.Text, IDL.Nat], [IDL.Nat], []),
-    multiswap: IDL.Func(
-      [
-        IDL.Vec(IDL.Principal),
-        IDL.Vec(IDL.Principal),
-        IDL.Vec(IDL.Nat),
-        IDL.Vec(IDL.Nat),
-        IDL.Principal,
-        IDL.Text,
-        IDL.Vec(IDL.Text),
-        IDL.Vec(IDL.Text),
-      ],
-      [],
-      []
-    ),
     singleComparedSwap: IDL.Func([IDL.Principal, IDL.Principal, IDL.Text, IDL.Text, IDL.Nat], [IDL.Nat], []),
     sonicSwap: IDL.Func([IDL.Principal, IDL.Principal, IDL.Text, IDL.Text, IDL.Nat], [IDL.Nat], []),
     sonicSwapAmountOut: IDL.Func([IDL.Principal, IDL.Principal, IDL.Nat], [IDL.Nat], []),
-    swapWithICPSwap: IDL.Func([IDL.Text, IDL.Text, IDL.Text, IDL.Text, IDL.Nat], [IDL.Nat], []),
-    swapWithSonic: IDL.Func([IDL.Principal, IDL.Principal, IDL.Text, IDL.Text, IDL.Nat], [IDL.Nat], []),
+    swapWithMidToken: IDL.Func([IDL.Principal, IDL.Principal, IDL.Principal, IDL.Nat, IDL.Text, IDL.Text, IDL.Text], [], []),
     withdrawTransferICRC1: IDL.Func([IDL.Principal], [], []),
   });
 };
+

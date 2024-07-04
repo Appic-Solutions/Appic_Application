@@ -1,4 +1,4 @@
-import { icpSwapPools, icpSwapFactory, sonicIdlFactory } from '@/did';
+import { icpSwapPools, icpSwapFactory, sonicIdlFactory, AppicMultiswapidlFactory } from '@/did';
 import canistersIDs from '@/config/canistersIDs';
 import { artemisWalletAdapter } from '@/utils/walletConnector';
 import { Principal } from '@dfinity/principal';
@@ -115,6 +115,24 @@ async function sonicSwapAmountOut(t0, t1, amountIn) {
   }
 }
 
+/**
+ * @notice This function retrieves the transaction history for a given user address.
+ * @param userAddress The principal ID of the user whose transaction history is to be fetched.
+ * @return The transaction history of the user.
+ * @example
+ * await getTxHistory('ryjl3-tyaaa-aaaaa-aaaba-cai');
+ */
+async function getTxHistory(userAddress) {
+  // Create an actor to interact with the APPIC multiswap canister.
+  let AppicActor = await artemisWalletAdapter.getCanisterActor(canistersIDs.APPIC_MULTISWAP, AppicMultiswapidlFactory, true);
+  // Fetch the user's transaction history from the canister.
+  let history = await AppicActor.getUserHistory(userAddress);
+  // Log the fetched history for debugging purposes.
+  console.log(history);
+  // Return the user's transaction history.
+  return history;
+}
+
 // Export the functions
-export { icpSwapAmountOut, sonicSwapAmountOut };
+export { icpSwapAmountOut, sonicSwapAmountOut, getTxHistory };
 

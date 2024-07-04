@@ -13,7 +13,7 @@ import { artemisWalletAdapter } from '@/utils/walletConnector';
 import { Principal } from '@dfinity/principal';
 import canistersIDs from '@/config/canistersIDs';
 import { AppicMultiswapidlFactory, icrcIdlFactory, dip20IdleFactory, icpSwapPools, icpSwapFactory, sonicIdlFactory } from '@/did';
-import { icpSwapAmountOut, sonicSwapAmountOut } from '@/helper/swapHelperFunction';
+import { icpSwapAmountOut, sonicSwapAmountOut, getTxHistory } from '@/helper/swapHelperFunction';
 
 function Swap(props) {
   const [tokenModal, setTokenModal] = useState({ isActive: false, modalType: 'sell', tokens: [] }); // modalType: buy, sell
