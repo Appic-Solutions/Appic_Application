@@ -181,7 +181,7 @@ function Swap(props) {
           swapData.sellToken.tokenType,
           swapData.buyToken.tokenType,
           BigNumber(swapData.amountToSell)
-            .multipliedBy(10 ** 8)
+            .multipliedBy(10 ** swapData.sellToken.decimals)
             .toNumber()
         );
         break;
@@ -193,7 +193,7 @@ function Swap(props) {
           swapData.sellToken.tokenType,
           swapData.buyToken.tokenType,
           BigNumber(swapData.amountToSell)
-            .multipliedBy(10 ** 8)
+            .multipliedBy(10 ** swapData.sellToken.decimals)
             .toNumber()
         );
         break;

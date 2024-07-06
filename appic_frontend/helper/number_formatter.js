@@ -106,6 +106,8 @@ export const validateInput = (value) => {
 
 // apply Decimlas
 export function applyDecimals(number, decimals) {
-  return BigNumber(number).dividedBy(10 ** decimals);
+  return BigNumber(number)
+    .dividedBy(10 ** decimals)
+    .toNumber();
 }
 
