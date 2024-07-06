@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import Title from './higerOrderComponents/titlesAndHeaders';
 import { useSelector } from 'react-redux';
 import darkModeClassnamegenerator from '@/utils/darkClassGenerator';
@@ -17,6 +17,14 @@ import { icpSwapAmountOut, sonicSwapAmountOut, getTxHistory } from '@/helper/swa
 
 function Swap(props) {
   const [tokenModal, setTokenModal] = useState({ isActive: false, modalType: 'sell', tokens: [] }); // modalType: buy, sell
+  const [transactionModal, setTransactionModal] = useState(false);
+  const [transactionStep1, setTransationStep1] = useState('notTriggered'); // inProgress, notTriggered, Rejected, Fialed , Successful
+  const [transactionStep2, setTransationStep2] = useState('notTriggered'); // inProgress, notTriggered, Rejected, Fialeds
+  const [transactionStepFailure, setTransactionStepFailure] = useState(null);
+  const intervalRef = useRef(null);
+  const [timeLeft, setTimeLeft] = useState(30);
+  const [tokenContractToShow, setTokenContractToShow] = useState('');
+  const [isComparisonActive, setIsComparisonActive] = useState(false);
   const [swapData, setSwapData] = useState({
     sellToken: {
       id: 'ryjl3-tyaaa-aaaaa-aaaba-cai',
@@ -32,10 +40,8 @@ function Swap(props) {
     },
     amountToSell: 0,
     swpaPairs: [],
+    shouldReview: true,
   });
-  const [tokenContractToShow, setTokenContractToShow] = useState('');
-  const [isComparisonActive, setIsComparisonActive] = useState(false);
-
   const isDark = useSelector((state) => state.theme.isDark);
   const isWalletConnected = useSelector((state) => state.wallet.items.isWalletConnected);
   const principalID = useSelector((state) => state.wallet.items.principalID);
@@ -65,11 +71,11 @@ function Swap(props) {
     return filteredtokens.sort((a, b) => Number(b.price) - Number(a.price));
   }
   // handle select tokens mode=  sell, buy
-  const handleSelect = (mode, token) => {
+  const handleSelect = async (mode, token) => {
     if (mode == 'buy') {
-      setSwapData({ ...swapData, buyToken: token });
+      setSwapData({ ...swapData, buyToken: token, swpaPairs: [] });
     } else {
-      setSwapData({ ...swapData, sellToken: token });
+      setSwapData({ ...swapData, sellToken: token, swpaPairs: [] });
     }
     setTokenModal({ ...tokenModal, isActive: false });
   };
@@ -130,7 +136,40 @@ function Swap(props) {
 
     dexsObject[0].selected = true;
 
-    setSwapData({ ...swapData, swpaPairs: dexsObject });
+    setSwapData({ ...swapData, swpaPairs: dexsObject, shouldReview: false });
+    setTimeLeft(30);
+  };
+
+  // Hook for updating the pairs after everychange
+  useEffect(() => {
+    const getRetuenAmountHandler = async () => {
+      await getReturnAmount();
+    };
+    getRetuenAmountHandler();
+  }, [swapData.sellToken, swapData.buyToken]);
+
+  // Switch buy and sell token
+  const switchBuyAndSell = async () => {
+    let newSwpaData = { ...swapData, buyToken: swapData.sellToken, sellToken: swapData.buyToken, amountToSell: 0, swpaPairs: [] };
+    setIsComparisonActive(false);
+    setSwapData(newSwpaData);
+  };
+
+  const handleSwap = async () => {
+    // Validate selected tokens and check if routes are selected
+    if (swapData.shouldReview == true || swapData.buyToken.symbol == 'ABC' || swapData.sellToken.symbol == 'XYZ' || swapData.swpaPairs.length == 0) {
+      console.log('please provide enough data');
+      return;
+    }
+    // Validate slected Route
+    let slectedRoute = swapData.swpaPairs.find((pair) => pair.selected == true);
+    if (slectedRoute.amountOut <= 0) {
+      console.log('please selecte a route with liquidity');
+      return;
+    }
+    console.log(slectedRoute);
+    setTransactionModal(true);
+    setTransationStep1('inProgress');
   };
 
   /**
@@ -493,7 +532,7 @@ function Swap(props) {
                   </div>
                 </div>
                 <div className="arrow">
-                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512">
+                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512" onClick={switchBuyAndSell}>
                     <path d="M438.6 278.6c12.5-12.5 12.5-32.8 0-45.3l-160-160c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3L338.8 224 32 224c-17.7 0-32 14.3-32 32s14.3 32 32 32l306.7 0L233.4 393.4c-12.5 12.5-12.5 32.8 0 45.3s32.8 12.5 45.3 0l160-160z" />
                   </svg>
                 </div>
@@ -521,9 +560,7 @@ function Swap(props) {
                   <div className="inputdatacontainer">
                     <input
                       onChange={(e) => {
-                        console.log(swapData);
-
-                        setSwapData({ ...swapData, amountToSell: e.target.value });
+                        setSwapData({ ...swapData, amountToSell: e.target.value, shouldReview: true });
                       }}
                       value={swapData.amountToSell}
                       type="number"
@@ -532,8 +569,11 @@ function Swap(props) {
                     <div className="buttonContainer">
                       <button
                         onClick={() => {
-                          console.log(swapData.sellToken);
-                          setSwapData({ ...swapData, amountToSell: applyDecimals(swapData.sellToken.balance, swapData.sellToken.decimals) });
+                          setSwapData({
+                            ...swapData,
+                            amountToSell: applyDecimals(swapData.sellToken.balance, swapData.sellToken.decimals),
+                            shouldReview: true,
+                          });
                         }}
                       >
                         Max
@@ -547,23 +587,32 @@ function Swap(props) {
               <button
                 disabled={swapData.buyToken.symbol == 'ABC' || swapData.sellToken.symbol == 'XYZ'}
                 onClick={async () => {
-                  setIsComparisonActive(!isComparisonActive);
-
-                  console.log(await getReturnAmount());
+                  if (swapData.shouldReview) {
+                    setIsComparisonActive(true);
+                    setSwapData({ ...swapData, swpaPairs: [] });
+                    await getReturnAmount();
+                  } else {
+                    await handleSwap();
+                  }
                 }}
-                className="swap_btn"
+                className={swapData.shouldReview ? 'swap_btn review' : 'swap_btn confirm'}
               >
-                {(swapData.buyToken.symbol == 'ABC' || swapData.sellToken.symbol == 'XYZ') && 'Select tokens'}Review Swap
+                {(swapData.buyToken.symbol == 'ABC' || swapData.sellToken.symbol == 'XYZ') && 'Select tokens'}
+                {swapData.shouldReview && !(swapData.buyToken.symbol == 'ABC' || swapData.sellToken.symbol == 'XYZ') && 'Review Swap'}
+                {!swapData.shouldReview && !(swapData.buyToken.symbol == 'ABC' || swapData.sellToken.symbol == 'XYZ') && 'Start Swapping'}
               </button>
             </div>
             <div className={isComparisonActive ? 'swap__routes active' : 'swap__routes'}>
               <div className="swapAndTimer">
                 <h2 className="title">Select Route</h2>
                 <Countdown
+                  timeLeft={timeLeft}
+                  setTimeLeft={setTimeLeft}
                   onCountdownComplete={async () => {
                     setSwapData({ ...swapData, swpaPairs: [] });
                     await getReturnAmount();
                   }}
+                  intervalRef={intervalRef}
                 />
               </div>
 
@@ -585,8 +634,14 @@ function Swap(props) {
                       className={pair.selected ? 'dex selected' : 'dex'}
                     >
                       <div className="badges">
-                        {index == 0 && <p className="badge">Best Return</p>}
-                        {pair.selected && <p className="badge">Selected</p>}
+                        {pair.amountOut == 0 ? (
+                          <p className="badge">No liquidity Available</p>
+                        ) : (
+                          <>
+                            {index == 0 && <p className="badge">Best Return</p>}
+                            {pair.selected && <p className="badge">Selected</p>}
+                          </>
+                        )}
                       </div>
                       <div className="return__details">
                         <img src={swapData.buyToken.logo} alt="" />
@@ -652,43 +707,178 @@ function Swap(props) {
           <div className="tokens">
             {tokenModal.tokens?.map((token) => {
               return (
-                <div
-                  onClick={() => {
-                    handleSelect(tokenModal.modalType, token);
-                  }}
-                  key={token.id}
-                  className="token"
-                  onMouseOver={() => {
-                    setTokenContractToShow(token.id);
-                  }}
-                  onMouseOut={() => {
-                    setTokenContractToShow('');
-                  }}
-                >
-                  <div className="token_info">
-                    <img className="token_logo" src={token.logo} alt="" />
-                    <div className="token_details">
-                      <h3 className="token_name">{token.name}</h3>
-                      <h4 className="token_symbol">{tokenContractToShow == token.id ? token.id : token.symbol}</h4>
+                <>
+                  {token.id == swapData.sellToken.id || token.id == swapData.buyToken.id ? (
+                    // If already selected add already selected look and text
+                    <div
+                      key={token.id}
+                      className="token selected"
+                      onMouseOver={() => {
+                        setTokenContractToShow(token.id);
+                      }}
+                      onMouseOut={() => {
+                        setTokenContractToShow('');
+                      }}
+                    >
+                      <div className="token_info">
+                        <img className="token_logo" src={token.logo} alt="" />
+                        <div className="token_details">
+                          <h3 className="token_name">
+                            {token.name} <span className="selectedBadge">selected</span>
+                          </h3>
+                          <h4 className="token_symbol">{tokenContractToShow == token.id ? token.id : token.symbol}</h4>
+                        </div>
+                      </div>
+                      <div className="token_balanceAndPrice">
+                        {tokenModal.modalType == 'sell' && <h3>{formatSignificantNumber(applyDecimals(token.balance, token.decimals))}</h3>}
+
+                        {tokenModal.modalType == 'buy' && <h3>Price</h3>}
+
+                        <p className="price">
+                          {tokenModal.modalType == 'sell' && (
+                            <> ${formatDecimalValue(BigNumber(token.price).multipliedBy(applyDecimals(token.balance, token.decimals)).toNumber())}</>
+                          )}
+
+                          {tokenModal.modalType == 'buy' && <> ${formatDecimalValue(BigNumber(token.price).toNumber())}</>}
+                        </p>
+                      </div>
                     </div>
-                  </div>
-                  <div className="token_balanceAndPrice">
-                    {tokenModal.modalType == 'sell' && <h3>{formatSignificantNumber(applyDecimals(token.balance, token.decimals))}</h3>}
+                  ) : (
+                    <div
+                      onClick={() => {
+                        handleSelect(tokenModal.modalType, token);
+                      }}
+                      key={token.id}
+                      className="token"
+                      onMouseOver={() => {
+                        setTokenContractToShow(token.id);
+                      }}
+                      onMouseOut={() => {
+                        setTokenContractToShow('');
+                      }}
+                    >
+                      <div className="token_info">
+                        <img className="token_logo" src={token.logo} alt="" />
+                        <div className="token_details">
+                          <h3 className="token_name">{token.name}</h3>
+                          <h4 className="token_symbol">{tokenContractToShow == token.id ? token.id : token.symbol}</h4>
+                        </div>
+                      </div>
+                      <div className="token_balanceAndPrice">
+                        {tokenModal.modalType == 'sell' && <h3>{formatSignificantNumber(applyDecimals(token.balance, token.decimals))}</h3>}
 
-                    {tokenModal.modalType == 'buy' && <h3>Price</h3>}
+                        {tokenModal.modalType == 'buy' && <h3>Price</h3>}
 
-                    <p className="price">
-                      {tokenModal.modalType == 'sell' && (
-                        <> ${formatDecimalValue(BigNumber(token.price).multipliedBy(applyDecimals(token.balance, token.decimals)).toNumber())}</>
-                      )}
+                        <p className="price">
+                          {tokenModal.modalType == 'sell' && (
+                            <> ${formatDecimalValue(BigNumber(token.price).multipliedBy(applyDecimals(token.balance, token.decimals)).toNumber())}</>
+                          )}
 
-                      {tokenModal.modalType == 'buy' && <> ${formatDecimalValue(BigNumber(token.price).toNumber())}</>}
-                    </p>
-                  </div>
-                </div>
+                          {tokenModal.modalType == 'buy' && <> ${formatDecimalValue(BigNumber(token.price).toNumber())}</>}
+                        </p>
+                      </div>
+                    </div>
+                  )}
+                </>
               );
             })}
           </div>
+        </div>
+      </Modal>
+
+      {/* Transaction Modal */}
+      <Modal active={transactionModal}>
+        <div className={darkModeClassnamegenerator('transactionModal')}>
+          <div className="topSection">
+            <button className="backBTN"></button>
+            <h3 className="title">Approve Transaction</h3>
+            <button
+              onClick={() => {
+                setTransactionModal(false);
+              }}
+              className="closeBTN"
+            >
+              <svg fill="none" viewBox="0 0 16 16">
+                <path
+                  fill="currentColor"
+                  fillRule="evenodd"
+                  d="M2.54 2.54a1 1 0 0 1 1.42 0L8 6.6l4.04-4.05a1 1 0 1 1 1.42 1.42L9.4 8l4.05 4.04a1 1 0 0 1-1.42 1.42L8 9.4l-4.04 4.05a1 1 0 0 1-1.42-1.42L6.6 8 2.54 3.96a1 1 0 0 1 0-1.42Z"
+                  clipRule="evenodd"
+                ></path>
+              </svg>
+            </button>
+          </div>
+          <div className="seprator">
+            <span></span>
+          </div>
+          <div className="stepContainer Approval">
+            <h1>Step 1</h1>
+            <div
+              className={`imagesContainer ${transactionStep1 == 'inProgress' ? 'active' : ''} ${transactionStep1 == 'Failed' ? 'Failed' : ''} ${
+                transactionStep1 == 'Successful' ? 'Successful' : ''
+              }`}
+            >
+              <div className="iconLoading">
+                <div className="coverBG"></div>
+                <div className="rotator"></div>
+              </div>
+              {transactionStep1 == 'inProgress' && (
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+                  <path d="M256 512A256 256 0 1 0 256 0a256 256 0 1 0 0 512zm0-384c13.3 0 24 10.7 24 24V264c0 13.3-10.7 24-24 24s-24-10.7-24-24V152c0-13.3 10.7-24 24-24zM224 352a32 32 0 1 1 64 0 32 32 0 1 1 -64 0z" />
+                </svg>
+              )}
+              {transactionStep1 == 'Successful' && (
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+                  <path d="M256 512A256 256 0 1 0 256 0a256 256 0 1 0 0 512zM369 209L241 337c-9.4 9.4-24.6 9.4-33.9 0l-64-64c-9.4-9.4-9.4-24.6 0-33.9s24.6-9.4 33.9 0l47 47L335 175c9.4-9.4 24.6-9.4 33.9 0s9.4 24.6 0 33.9z" />
+                </svg>
+              )}
+              {transactionStep1 == 'Failed' && (
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+                  <path d="M367.2 412.5L99.5 144.8C77.1 176.1 64 214.5 64 256c0 106 86 192 192 192c41.5 0 79.9-13.1 111.2-35.5zm45.3-45.3C434.9 335.9 448 297.5 448 256c0-106-86-192-192-192c-41.5 0-79.9 13.1-111.2 35.5L412.5 367.2zM0 256a256 256 0 1 1 512 0A256 256 0 1 1 0 256z" />
+                </svg>
+              )}
+            </div>
+            <p className="transactionDetail">{transactionStep1 == 'Failed' ? transactionStepFailure : 'Please approve the transaction.'}</p>
+          </div>
+          <div className="stepContainer dcaCreation">
+            <h1>Step 2</h1>
+            <div
+              className={`imagesContainer ${transactionStep2 == 'inProgress' ? 'active' : ''} ${transactionStep2 == 'Failed' ? 'Failed' : ''} ${
+                transactionStep2 == 'Successful' ? 'Successful' : ''
+              }`}
+            >
+              <div className="iconLoading">
+                <div className="coverBG"></div>
+
+                <div className="rotator"></div>
+              </div>
+              {transactionStep2 == 'notTriggered' && (
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+                  <path d="M256 512A256 256 0 1 0 256 0a256 256 0 1 0 0 512zm0-384c13.3 0 24 10.7 24 24V264c0 13.3-10.7 24-24 24s-24-10.7-24-24V152c0-13.3 10.7-24 24-24zM224 352a32 32 0 1 1 64 0 32 32 0 1 1 -64 0z" />
+                </svg>
+              )}
+              {transactionStep2 == 'inProgress' && (
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+                  <path d="M256 512A256 256 0 1 0 256 0a256 256 0 1 0 0 512zm0-384c13.3 0 24 10.7 24 24V264c0 13.3-10.7 24-24 24s-24-10.7-24-24V152c0-13.3 10.7-24 24-24zM224 352a32 32 0 1 1 64 0 32 32 0 1 1 -64 0z" />
+                </svg>
+              )}
+              {transactionStep2 == 'Successful' && (
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+                  <path d="M256 512A256 256 0 1 0 256 0a256 256 0 1 0 0 512zM369 209L241 337c-9.4 9.4-24.6 9.4-33.9 0l-64-64c-9.4-9.4-9.4-24.6 0-33.9s24.6-9.4 33.9 0l47 47L335 175c9.4-9.4 24.6-9.4 33.9 0s9.4 24.6 0 33.9z" />
+                </svg>
+              )}
+              {transactionStep2 == 'Failed' && (
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+                  <path d="M367.2 412.5L99.5 144.8C77.1 176.1 64 214.5 64 256c0 106 86 192 192 192c41.5 0 79.9-13.1 111.2-35.5zm45.3-45.3C434.9 335.9 448 297.5 448 256c0-106-86-192-192-192c-41.5 0-79.9 13.1-111.2 35.5L412.5 367.2zM0 256a256 256 0 1 1 512 0A256 256 0 1 1 0 256z" />
+                </svg>
+              )}
+            </div>
+            <p className="transactionDetail">
+              {transactionStep2 == 'Failed' ? transactionStepFailure : 'Please Wait until the position is created.'}
+            </p>
+          </div>
+
+          <button className="viewPosition">View your Position</button>
         </div>
       </Modal>
     </>

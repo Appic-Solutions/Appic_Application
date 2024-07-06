@@ -1,8 +1,6 @@
 import React, { useState, useEffect } from 'react';
 
-const Countdown = ({ onCountdownComplete }) => {
-  const [timeLeft, setTimeLeft] = useState(30);
-
+const Countdown = ({ onCountdownComplete, timeLeft, setTimeLeft, intervalRef }) => {
   useEffect(() => {
     if (timeLeft === 0) {
       onCountdownComplete();
@@ -10,11 +8,11 @@ const Countdown = ({ onCountdownComplete }) => {
       return;
     }
 
-    const timerId = setInterval(() => {
+    intervalRef.current = setInterval(() => {
       setTimeLeft((prev) => prev - 1);
     }, 1000);
 
-    return () => clearInterval(timerId);
+    return () => clearInterval(intervalRef.current);
   }, [timeLeft, onCountdownComplete]);
 
   const circumference = 2 * Math.PI * 13.5;

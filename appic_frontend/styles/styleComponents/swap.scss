@@ -169,6 +169,10 @@
             cursor: unset;
             background-color: #8c6c91;
           }
+
+          &.review {
+            border: 3px solid #c7c7c7;
+          }
         }
       }
     }

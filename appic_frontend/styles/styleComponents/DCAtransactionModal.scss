@@ -285,25 +285,82 @@
         margin-bottom: 3rem;
       }
     }
+    .viewPosition {
+      background-color: $light-secondary;
+      color: #fff;
+      border-radius: $border-radius;
+      padding: 1.2rem 1rem;
+      font-weight: 600;
+      cursor: pointer;
+    }
 
     &.dark {
       .topSection {
         .backBTN {
+          background: none;
           color: $dark-primary;
+
           svg {
+            fill: none;
           }
         }
         .closeBTN {
+          background: none;
           color: $dark-primary;
           svg {
+            fill: none;
           }
         }
         .title {
           color: $dark-primary;
         }
       }
+
       .seprator {
         background-color: $dark-tertiary;
+      }
+      .stepContainer {
+        h1 {
+          color: $dark-primary;
+        }
+        .imagesContainer {
+          .iconLoading {
+            .coverBG {
+              background: $dark-bg;
+            }
+            .rotator {
+              background: $default-gradient;
+            }
+          }
+
+          svg {
+            fill: $dark-skeleton;
+          }
+          &.active {
+            .iconLoading {
+            }
+            svg {
+              fill: $dark-secondary;
+            }
+          }
+          &.Failed {
+            svg {
+              fill: $dark-percentageDown;
+            }
+          }
+          &.Successful {
+            svg {
+              fill: $dark-percentageUP !important;
+            }
+          }
+        }
+        .transactionDetail {
+          color: $dark-primary;
+        }
+        .viewPosition {
+          background-color: $dark-secondary;
+          color: $dark-primary;
+        }
       }
     }
   }
