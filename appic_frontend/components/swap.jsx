@@ -73,11 +73,12 @@ function Swap(props) {
   // handle select tokens mode=  sell, buy
   const handleSelect = async (mode, token) => {
     if (mode == 'buy') {
-      setSwapData({ ...swapData, buyToken: token, swpaPairs: [] });
+      setSwapData({ ...swapData, buyToken: token, swpaPairs: [], shouldReview: true });
     } else {
-      setSwapData({ ...swapData, sellToken: token, swpaPairs: [] });
+      setSwapData({ ...swapData, sellToken: token, swpaPairs: [], shouldReview: true });
     }
     setTokenModal({ ...tokenModal, isActive: false });
+    setIsComparisonActive(false);
   };
 
   // Get Dex logo
@@ -141,12 +142,12 @@ function Swap(props) {
   };
 
   // Hook for updating the pairs after everychange
-  useEffect(() => {
-    const getRetuenAmountHandler = async () => {
-      await getReturnAmount();
-    };
-    getRetuenAmountHandler();
-  }, [swapData.sellToken, swapData.buyToken]);
+  // useEffect(() => {
+  //   const getRetuenAmountHandler = async () => {
+  //     await getReturnAmount();
+  //   };
+  //   getRetuenAmountHandler();
+  // }, [swapData.sellToken, swapData.buyToken]);
 
   // Switch buy and sell token
   const switchBuyAndSell = async () => {
@@ -169,7 +170,7 @@ function Swap(props) {
     }
     console.log(slectedRoute);
     clearInterval(intervalRef.current);
-    setTimeLeft(0);
+    // setTimeLeft(0);
     setTransactionModal(true);
     setTransationStep1('inProgress');
     switch (slectedRoute.dex) {
@@ -246,6 +247,7 @@ function Swap(props) {
             created_at_time: [],
             amount: BigNumber(amtSell).minus(fee).toNumber(),
           });
+          console.log(tx);
         } else if (sellTokenType === 'ICRC2') {
           // Create an actor for the sell token canister.
           let icrc2 = await artemisWalletAdapter.getCanisterActor(sellToken, icrcIdlFactory, false);
@@ -262,6 +264,7 @@ function Swap(props) {
             amount: BigNumber(amtSell).minus(fee).toNumber(),
             spender: { owner: Principal.fromText(canistersIDs.APPIC_MULTISWAP), subaccount: [] },
           });
+          console.log(tx);
         } else if (sellTokenType === 'YC' || sellTokenType === 'DIP20') {
           // Create an actor for the sell token canister.
           let dip20 = await artemisWalletAdapter.getCanisterActor(sellToken, dip20IdleFactory, false);
@@ -285,9 +288,10 @@ function Swap(props) {
         return sendMultiTras;
       }
     } catch (error) {
+      console.log('Failed', error.message);
       setTransationStep1('Failed');
       setTransationStep2('Failed');
-      setTransactionStepFailure(error.message);
+      setTransactionStepFailure(error.message || 'Transaction failed');
     }
   }
 
@@ -827,20 +831,29 @@ function Swap(props) {
           <div className="topSection">
             <button className="backBTN"></button>
             <h3 className="title">Approve Transaction</h3>
+
             <button
+              disabled={transactionStep1 == 'inProgress' || transactionStep2 == 'inProgress'}
               onClick={() => {
                 setTransactionModal(false);
+                setTransationStep1('notTriggered');
+                setTransationStep2('notTriggered');
+                setTransactionStepFailure(null);
+                setSwapData({ ...swapData, swpaPairs: [], shouldReview: true });
+                setIsComparisonActive(false);
               }}
               className="closeBTN"
             >
-              <svg fill="none" viewBox="0 0 16 16">
-                <path
-                  fill="currentColor"
-                  fillRule="evenodd"
-                  d="M2.54 2.54a1 1 0 0 1 1.42 0L8 6.6l4.04-4.05a1 1 0 1 1 1.42 1.42L9.4 8l4.05 4.04a1 1 0 0 1-1.42 1.42L8 9.4l-4.04 4.05a1 1 0 0 1-1.42-1.42L6.6 8 2.54 3.96a1 1 0 0 1 0-1.42Z"
-                  clipRule="evenodd"
-                ></path>
-              </svg>
+              {!(transactionStep1 == 'inProgress' || transactionStep2 == 'inProgress') && (
+                <svg fill="none" viewBox="0 0 16 16">
+                  <path
+                    fill="currentColor"
+                    fillRule="evenodd"
+                    d="M2.54 2.54a1 1 0 0 1 1.42 0L8 6.6l4.04-4.05a1 1 0 1 1 1.42 1.42L9.4 8l4.05 4.04a1 1 0 0 1-1.42 1.42L8 9.4l-4.04 4.05a1 1 0 0 1-1.42-1.42L6.6 8 2.54 3.96a1 1 0 0 1 0-1.42Z"
+                    clipRule="evenodd"
+                  ></path>
+                </svg>
+              )}
             </button>
           </div>
           <div className="seprator">
@@ -908,12 +921,10 @@ function Swap(props) {
                 </svg>
               )}
             </div>
-            <p className="transactionDetail">
-              {transactionStep2 == 'Failed' ? transactionStepFailure : 'Please Wait until the position is created.'}
-            </p>
+            <p className="transactionDetail">{transactionStep2 == 'Failed' ? transactionStepFailure : 'Please wait until the swap is done.'}</p>
           </div>
 
-          <button className="viewPosition">View your Position</button>
+          {/* <button className="viewPosition">View your Position</button> */}
         </div>
       </Modal>
     </>
