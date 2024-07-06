@@ -132,6 +132,14 @@ async function getTxHistory(userAddress) {
   // Return the user's transaction history.
   return history;
 }
+
+/**
+ * @notice This function retrieves the transaction status for a given user address.
+ * @param userAddress The principal ID of the user whose transaction status is to be Checked.
+ * @return The transaction status bool.
+ * @example
+ * await getTxStatus('ryjl3-tyaaa-aaaaa-aaaba-cai');
+ */
 async function getTxStatus(userAddress) {
   // Create an actor to interact with the APPIC multiswap canister.
   let AppicActor = await artemisWalletAdapter.getCanisterActor(canistersIDs.APPIC_MULTISWAP, AppicMultiswapidlFactory, true);
