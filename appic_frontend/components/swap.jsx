@@ -27,13 +27,13 @@ function Swap(props) {
   const [isComparisonActive, setIsComparisonActive] = useState(false);
   const [swapData, setSwapData] = useState({
     sellToken: {
-      id: 'ryjl3-tyaaa-aaaaa-aaaba-cai',
+      id: '',
       name: 'Select Token',
       symbol: 'XYZ',
       logo: '/blankToken.png',
     },
     buyToken: {
-      id: 'mxzaz-hqaaa-aaaar-qaada-cai',
+      id: '',
       name: 'Select Token',
       symbol: 'ABC',
       logo: '/blankToken.png',
