@@ -152,5 +152,5 @@ async function getTxStatus(userAddress) {
 }
 
 // Export the functions
-export { icpSwapAmountOut, sonicSwapAmountOut, getTxHistory };
+export { icpSwapAmountOut, sonicSwapAmountOut, getTxHistory, getTxStatus };
 
