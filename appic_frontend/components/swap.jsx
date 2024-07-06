@@ -406,7 +406,7 @@ function Swap(props) {
       // Handle different sell token types.
       if (sellTokenType === 'ICRC1') {
         // Create an actor for the sell token canister.
-        let icrc1 = await artemisWalletAdapter.getCanisterActor(sellToken, icrcIdlFactory, false);
+        let icrc1 = await artemisWalletAdapter.getCanisterActor(sellToken, icrcIdlFactory, true);
         fee = await icrc1.icrc1_fee();
 
         // Transfer the sell token to the APPIC multiswap canister.
@@ -423,7 +423,7 @@ function Swap(props) {
         });
       } else if (sellTokenType === 'ICRC2') {
         // Create an actor for the sell token canister.
-        let icrc2 = await artemisWalletAdapter.getCanisterActor(sellToken, icrcIdlFactory, false);
+        let icrc2 = await artemisWalletAdapter.getCanisterActor(sellToken, icrcIdlFactory, true);
         fee = await icrc2.icrc1_fee();
 
         // Approve the APPIC multiswap canister to spend the sell token.
@@ -621,7 +621,9 @@ function Swap(props) {
                       </button>
                     </div>
                     <p className="usdPrice">${BigNumber(swapData.amountToSell).multipliedBy(swapData.sellToken.price).toNumber() || 0}</p>
-                    <span className="balance">available/ {applyDecimals(swapData.sellToken.balance, swapData.sellToken.decimals) || 0}</span>
+                    <span className="balance">
+                      available/ {formatSignificantNumber(applyDecimals(swapData.sellToken.balance, swapData.sellToken.decimals)) || 0}
+                    </span>
                   </div>
                 </div>
               </div>
