@@ -87,6 +87,7 @@ export const AppicMultiswapidlFactory = ({ IDL }) => {
     changeOwner: IDL.Func([IDL.Principal], [], []),
     getICRC1SubAccount: IDL.Func([IDL.Principal], [Subaccount], ['query']),
     getTxNumber: IDL.Func([], [IDL.Nat], ['query']),
+    getTxStatus: IDL.Func([IDL.Text], [IDL.Bool], ['query']),
     getUserHistory: IDL.Func([IDL.Text], [IDL.Vec(TxHistory)], ['query']),
     getUserPrincipal: IDL.Func([], [IDL.Vec(IDL.Text)], ['query']),
     icpSwap: IDL.Func([IDL.Principal, IDL.Principal, IDL.Text, IDL.Text, IDL.Nat], [IDL.Nat], []),
@@ -94,7 +95,7 @@ export const AppicMultiswapidlFactory = ({ IDL }) => {
     singleComparedSwap: IDL.Func([IDL.Principal, IDL.Principal, IDL.Text, IDL.Text, IDL.Nat], [IDL.Nat], []),
     sonicSwap: IDL.Func([IDL.Principal, IDL.Principal, IDL.Text, IDL.Text, IDL.Nat], [IDL.Nat], []),
     sonicSwapAmountOut: IDL.Func([IDL.Principal, IDL.Principal, IDL.Nat], [IDL.Nat], []),
-    swapWithMidToken: IDL.Func([IDL.Principal, IDL.Principal, IDL.Principal, IDL.Nat, IDL.Text, IDL.Text, IDL.Text], [], []),
+    swapWithMidToken: IDL.Func([IDL.Principal, IDL.Principal, IDL.Principal, IDL.Nat, IDL.Text, IDL.Text, IDL.Text], [IDL.Nat], []),
     withdrawTransferICRC1: IDL.Func([IDL.Principal], [], []),
   });
 };
