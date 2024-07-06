@@ -132,6 +132,16 @@ async function getTxHistory(userAddress) {
   // Return the user's transaction history.
   return history;
 }
+async function getTxStatus(userAddress) {
+  // Create an actor to interact with the APPIC multiswap canister.
+  let AppicActor = await artemisWalletAdapter.getCanisterActor(canistersIDs.APPIC_MULTISWAP, AppicMultiswapidlFactory, true);
+  // Fetch the user's transaction history from the canister.
+  let status = await AppicActor.getTxStatus(userAddress);
+  // Log the fetched history for debugging purposes.
+  console.log(status);
+  // Return the user's transaction history.
+  return status;
+}
 
 // Export the functions
 export { icpSwapAmountOut, sonicSwapAmountOut, getTxHistory };
