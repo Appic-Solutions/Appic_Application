@@ -233,13 +233,12 @@ function Swap(props) {
         if (sellTokenType === 'ICRC1') {
           // Create an actor for the sell token canister.
           let icrc1 = await artemisWalletAdapter.getCanisterActor(sellToken, icrcIdlFactory, false);
-          fee = icrc1.icrc1_fee();
-
+          fee = await icrc1.icrc1_fee();
           // Transfer the sell token to the APPIC multiswap canister.
           const tx = await icrc1.icrc1_transfer({
             to: {
               owner: Principal.fromText(canistersIDs.APPIC_MULTISWAP),
-              subaccount: subAccount,
+              subaccount: [subAccount],
             },
             fee: [],
             memo: [],
@@ -250,7 +249,7 @@ function Swap(props) {
         } else if (sellTokenType === 'ICRC2') {
           // Create an actor for the sell token canister.
           let icrc2 = await artemisWalletAdapter.getCanisterActor(sellToken, icrcIdlFactory, false);
-          fee = icrc2.icrc1_fee();
+          fee = await icrc2.icrc1_fee();
 
           // Approve the APPIC multiswap canister to spend the sell token.
           const tx = await icrc2.icrc2_approve({
@@ -266,7 +265,7 @@ function Swap(props) {
         } else if (sellTokenType === 'YC' || sellTokenType === 'DIP20') {
           // Create an actor for the sell token canister.
           let dip20 = await artemisWalletAdapter.getCanisterActor(sellToken, dip20IdleFactory, false);
-          fee = dip20.getTokenFee();
+          fee = await dip20.getTokenFee();
 
           // Approve the APPIC multiswap canister to spend the sell token.
           const tx = await dip20.approve(Principal.fromText(canistersIDs.APPIC_MULTISWAP), BigNumber(amtSell).minus(fee).toNumber());
@@ -321,7 +320,7 @@ function Swap(props) {
       if (sellTokenType === 'ICRC1') {
         // Create an actor for the sell token canister.
         let icrc1 = await artemisWalletAdapter.getCanisterActor(sellToken, icrcIdlFactory, false);
-        fee = icrc1.icrc1_fee();
+        fee = await icrc1.icrc1_fee();
 
         // Transfer the sell token to the APPIC multiswap canister.
         const tx = await icrc1.icrc1_transfer({
@@ -338,7 +337,7 @@ function Swap(props) {
       } else if (sellTokenType === 'ICRC2') {
         // Create an actor for the sell token canister.
         let icrc2 = await artemisWalletAdapter.getCanisterActor(sellToken, icrcIdlFactory, false);
-        fee = icrc2.icrc1_fee();
+        fee = await icrc2.icrc1_fee();
 
         // Approve the APPIC multiswap canister to spend the sell token.
         const tx = await icrc2.icrc2_approve({
@@ -354,7 +353,7 @@ function Swap(props) {
       } else if (sellTokenType === 'YC' || sellTokenType === 'DIP20') {
         // Create an actor for the sell token canister.
         let dip20 = await artemisWalletAdapter.getCanisterActor(sellToken, dip20IdleFactory, false);
-        fee = dip20.getTokenFee();
+        fee = await dip20.getTokenFee();
 
         // Approve the APPIC multiswap canister to spend the sell token.
         const tx = await dip20.approve(Principal.fromText(canistersIDs.APPIC_MULTISWAP), BigNumber(amtSell).minus(fee).toNumber());
@@ -404,7 +403,7 @@ function Swap(props) {
       if (sellTokenType === 'ICRC1') {
         // Create an actor for the sell token canister.
         let icrc1 = await artemisWalletAdapter.getCanisterActor(sellToken, icrcIdlFactory, false);
-        fee = icrc1.icrc1_fee();
+        fee = await icrc1.icrc1_fee();
 
         // Transfer the sell token to the APPIC multiswap canister.
         const tx = await icrc1.icrc1_transfer({
@@ -421,7 +420,7 @@ function Swap(props) {
       } else if (sellTokenType === 'ICRC2') {
         // Create an actor for the sell token canister.
         let icrc2 = await artemisWalletAdapter.getCanisterActor(sellToken, icrcIdlFactory, false);
-        fee = icrc2.icrc1_fee();
+        fee = await icrc2.icrc1_fee();
 
         // Approve the APPIC multiswap canister to spend the sell token.
         const tx = await icrc2.icrc2_approve({
@@ -437,7 +436,7 @@ function Swap(props) {
       } else if (sellTokenType === 'YC' || sellTokenType === 'DIP20') {
         // Create an actor for the sell token canister.
         let dip20 = await artemisWalletAdapter.getCanisterActor(sellToken, dip20IdleFactory, false);
-        fee = dip20.getTokenFee();
+        fee = await dip20.getTokenFee();
 
         // Approve the APPIC multiswap canister to spend the sell token.
         const tx = await dip20.approve(Principal.fromText(canistersIDs.APPIC_MULTISWAP), BigNumber(amtSell).minus(fee).toNumber());
@@ -490,7 +489,7 @@ function Swap(props) {
       if (sellTokenType === 'ICRC1') {
         // Create an actor for the sell token canister.
         let icrc1 = await artemisWalletAdapter.getCanisterActor(sellToken, icrcIdlFactory, false);
-        fee = icrc1.icrc1_fee();
+        fee = await icrc1.icrc1_fee();
 
         // Transfer the sell token to the APPIC multiswap canister.
         const tx = await icrc1.icrc1_transfer({
@@ -507,7 +506,7 @@ function Swap(props) {
       } else if (sellTokenType === 'ICRC2') {
         // Create an actor for the sell token canister.
         let icrc2 = await artemisWalletAdapter.getCanisterActor(sellToken, icrcIdlFactory, false);
-        fee = icrc2.icrc1_fee();
+        fee = await icrc2.icrc1_fee();
 
         // Approve the APPIC multiswap canister to spend the sell token.
         const tx = await icrc2.icrc2_approve({
@@ -523,7 +522,7 @@ function Swap(props) {
       } else if (sellTokenType === 'YC' || sellTokenType === 'DIP20') {
         // Create an actor for the sell token canister.
         let dip20 = await artemisWalletAdapter.getCanisterActor(sellToken, dip20IdleFactory, false);
-        fee = dip20.getTokenFee();
+        fee = await dip20.getTokenFee();
 
         // Approve the APPIC multiswap canister to spend the sell token.
         const tx = await dip20.approve(Principal.fromText(canistersIDs.APPIC_MULTISWAP), BigNumber(amtSell).minus(fee).toNumber());
