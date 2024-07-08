@@ -58,7 +58,7 @@ function WalletConnectM() {
   const { getTokensPricesError } = usePrices(allTokensList, icpPrice);
   // Fetch token balances and usd balance of each user
   const { principalAssetsError } = useBalances(isWalletConnected, principalID, accoundID, supportedTokens);
-  //  Fetch Supported pairs from Appic canister
+  //  Fetch Supported pairs from Appic canister for auto invest feature
   const { getSupportedPairsError } = useSupportedPairs(assets, supportedTokens);
   //  Get All user DCA positions
   const {} = useUserDcaPositions(principalID, supportedTokens);

@@ -21,7 +21,7 @@ export default function Home() {
           <>
             {activeComponent == '' && <WalletTokens />}
             {activeComponent == 'DCA' && <DCA></DCA>}
-            {activeComponent == 'SWAP' && <Swap></Swap>}
+            {activeComponent == 'SWAP' && <Swap setActiveComponent={setActiveComponent}></Swap>}
           </>
         )}
       </main>

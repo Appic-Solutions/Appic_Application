@@ -15,13 +15,15 @@ import canistersIDs from '@/config/canistersIDs';
 import { AppicMultiswapidlFactory, icrcIdlFactory, dip20IdleFactory, icpSwapPools, icpSwapFactory, sonicIdlFactory } from '@/did';
 import { icpSwapAmountOut, sonicSwapAmountOut, getTxHistory, getTxStatus } from '@/helper/swapHelperFunction';
 
-function Swap(props) {
+function Swap({ setActiveComponent }) {
   const [tokenModal, setTokenModal] = useState({ isActive: false, modalType: 'sell', tokens: [] }); // modalType: buy, sell
   const [transactionModal, setTransactionModal] = useState(false);
   const [transactionStep1, setTransationStep1] = useState('notTriggered'); // inProgress, notTriggered, Rejected, Fialed , Successful
   const [transactionStep2, setTransationStep2] = useState('notTriggered'); // inProgress, notTriggered, Rejected, Fialeds
   const [transactionStepFailure, setTransactionStepFailure] = useState(null);
   const intervalRef = useRef(null);
+
+  const intervalTransactionSatus = useRef(null);
   const [timeLeft, setTimeLeft] = useState(30);
   const [tokenContractToShow, setTokenContractToShow] = useState('');
   const [isComparisonActive, setIsComparisonActive] = useState(false);
@@ -170,7 +172,7 @@ function Swap(props) {
     }
     console.log(slectedRoute);
     clearInterval(intervalRef.current);
-    // setTimeLeft(0);
+    setTimeLeft(0);
     setTransactionModal(true);
     setTransationStep1('inProgress');
     switch (slectedRoute.dex) {
@@ -219,6 +221,7 @@ function Swap(props) {
       if (amountOut == 0) {
         setTransationStep1('Failed');
         setTransactionStepFailure('No liquidity Found');
+        return;
       }
       if (amountOut != 0) {
         // Create an actor to interact with the APPIC multiswap canister.
@@ -228,7 +231,6 @@ function Swap(props) {
 
         // Get the sub-account for the caller.
         const subAccount = await AppicActor.getICRC1SubAccount(caller);
-        console.log('subAccount', subAccount);
 
         // Handle different sell token types.
         if (sellTokenType === 'ICRC1') {
@@ -264,7 +266,6 @@ function Swap(props) {
             amount: BigNumber(amtSell).minus(fee).toNumber(),
             spender: { owner: Principal.fromText(canistersIDs.APPIC_MULTISWAP), subaccount: [] },
           });
-          console.log(tx);
         } else if (sellTokenType === 'YC' || sellTokenType === 'DIP20') {
           // Create an actor for the sell token canister.
           let dip20 = await artemisWalletAdapter.getCanisterActor(sellToken, dip20IdleFactory, false);
@@ -275,6 +276,14 @@ function Swap(props) {
         }
         setTransationStep1('Successful');
         setTransationStep2('inProgress');
+        intervalTransactionSatus.current = setInterval(async () => {
+          let swapResult = await getTxStatus(principalID);
+          if (swapResult == true) {
+            setTransationStep2('Successful');
+            clearInterval(intervalTransactionSatus);
+            return;
+          }
+        }, 10000);
         // Perform the swap.
         let sendMultiTras = await AppicActor.sonicSwap(
           Principal.fromText(sellToken),
@@ -283,8 +292,7 @@ function Swap(props) {
           buyTokenType,
           BigNumber(amtSell).minus(fee).toNumber()
         );
-        setTransationStep2('Successful');
-        console.log(sendMultiTras);
+        // setTransationStep2('Successful');
         return sendMultiTras;
       }
     } catch (error) {
@@ -307,73 +315,96 @@ function Swap(props) {
    * await swapWithICPswap('qbizb-wiaaa-aaaaq-aabwq-cai', 'ryjl3-tyaaa-aaaaa-aaaba-cai', 'ICRC1', 'ICRC2', '1000000000000');
    */
   async function swapWithICPswap(sellToken, buyToken, sellTokenType, buyTokenType, amtSell) {
-    // Get the amount of buyToken that can be obtained for amtSell of sellToken.
-    let amountOut = await icpSwapAmountOut(sellToken, buyToken, amtSell);
-
-    if (amountOut != 0) {
-      // Create an actor to interact with the APPIC multiswap canister.
-      let AppicActor = await artemisWalletAdapter.getCanisterActor(canistersIDs.APPIC_MULTISWAP, AppicMultiswapidlFactory, false);
-      let caller = Principal.fromText(principalID);
-      let fee;
-
-      // Get the sub-account for the caller.
-      const subAccount = await AppicActor.getICRC1SubAccount(caller);
-      console.log('subAccount', subAccount);
-
-      // Handle different sell token types.
-      if (sellTokenType === 'ICRC1') {
-        // Create an actor for the sell token canister.
-        let icrc1 = await artemisWalletAdapter.getCanisterActor(sellToken, icrcIdlFactory, false);
-        fee = await icrc1.icrc1_fee();
-
-        // Transfer the sell token to the APPIC multiswap canister.
-        const tx = await icrc1.icrc1_transfer({
-          to: {
-            owner: Principal.fromText(canistersIDs.APPIC_MULTISWAP),
-            subaccount: [subAccount],
-          },
-          fee: [],
-          memo: [],
-          from_subaccount: [],
-          created_at_time: [],
-          amount: BigNumber(amtSell).minus(fee).toNumber(),
-        });
-      } else if (sellTokenType === 'ICRC2') {
-        // Create an actor for the sell token canister.
-        let icrc2 = await artemisWalletAdapter.getCanisterActor(sellToken, icrcIdlFactory, false);
-        fee = await icrc2.icrc1_fee();
-
-        // Approve the APPIC multiswap canister to spend the sell token.
-        const tx = await icrc2.icrc2_approve({
-          fee: [],
-          memo: [],
-          from_subaccount: [],
-          created_at_time: [],
-          expected_allowance: [],
-          expires_at: [],
-          amount: BigNumber(amtSell).minus(fee).toNumber(),
-          spender: { owner: Principal.fromText(canistersIDs.APPIC_MULTISWAP), subaccount: [] },
-        });
-      } else if (sellTokenType === 'YC' || sellTokenType === 'DIP20') {
-        // Create an actor for the sell token canister.
-        let dip20 = await artemisWalletAdapter.getCanisterActor(sellToken, dip20IdleFactory, false);
-        fee = await dip20.getTokenFee();
-
-        // Approve the APPIC multiswap canister to spend the sell token.
-        const tx = await dip20.approve(Principal.fromText(canistersIDs.APPIC_MULTISWAP), BigNumber(amtSell).minus(fee).toNumber());
+    try {
+      // Get the amount of buyToken that can be obtained for amtSell of sellToken.
+      let amountOut = await icpSwapAmountOut(sellToken, buyToken, amtSell);
+      console.log(sellToken, buyToken, sellTokenType, buyTokenType, amtSell);
+      if (amountOut == 0) {
+        setTransationStep1('Failed');
+        setTransactionStepFailure('No liquidity Found');
+        return;
       }
 
-      // Perform the swap.
-      let sendMultiTras = await AppicActor.icpSwap(
-        Principal.fromText(sellToken),
-        Principal.fromText(buyToken),
-        sellTokenType,
-        buyTokenType,
-        BigNumber(amtSell).minus(fee).toNumber()
-      );
+      if (amountOut != 0) {
+        // Create an actor to interact with the APPIC multiswap canister.
+        let AppicActor = await artemisWalletAdapter.getCanisterActor(canistersIDs.APPIC_MULTISWAP, AppicMultiswapidlFactory, false);
+        let caller = Principal.fromText(principalID);
+        let fee;
 
-      console.log(sendMultiTras);
-      return sendMultiTras;
+        // Get the sub-account for the caller.
+        const subAccount = await AppicActor.getICRC1SubAccount(caller);
+        console.log('subAccount', subAccount);
+
+        // Handle different sell token types.
+        if (sellTokenType === 'ICRC1') {
+          // Create an actor for the sell token canister.
+          let icrc1 = await artemisWalletAdapter.getCanisterActor(sellToken, icrcIdlFactory, false);
+          fee = await icrc1.icrc1_fee();
+
+          // Transfer the sell token to the APPIC multiswap canister.
+          const tx = await icrc1.icrc1_transfer({
+            to: {
+              owner: Principal.fromText(canistersIDs.APPIC_MULTISWAP),
+              subaccount: [subAccount],
+            },
+            fee: [],
+            memo: [],
+            from_subaccount: [],
+            created_at_time: [],
+            amount: BigNumber(amtSell).minus(fee).toNumber(),
+          });
+        } else if (sellTokenType === 'ICRC2') {
+          // Create an actor for the sell token canister.
+          let icrc2 = await artemisWalletAdapter.getCanisterActor(sellToken, icrcIdlFactory, false);
+          fee = await icrc2.icrc1_fee();
+
+          // Approve the APPIC multiswap canister to spend the sell token.
+          const tx = await icrc2.icrc2_approve({
+            fee: [],
+            memo: [],
+            from_subaccount: [],
+            created_at_time: [],
+            expected_allowance: [],
+            expires_at: [],
+            amount: BigNumber(amtSell).minus(fee).toNumber(),
+            spender: { owner: Principal.fromText(canistersIDs.APPIC_MULTISWAP), subaccount: [] },
+          });
+        } else if (sellTokenType === 'YC' || sellTokenType === 'DIP20') {
+          // Create an actor for the sell token canister.
+          let dip20 = await artemisWalletAdapter.getCanisterActor(sellToken, dip20IdleFactory, false);
+          fee = await dip20.getTokenFee();
+
+          // Approve the APPIC multiswap canister to spend the sell token.
+          const tx = await dip20.approve(Principal.fromText(canistersIDs.APPIC_MULTISWAP), BigNumber(amtSell).minus(fee).toNumber());
+        }
+        setTransationStep1('Successful');
+        setTransationStep2('inProgress');
+        intervalTransactionSatus.current = setInterval(async () => {
+          let swapResult = await getTxStatus(principalID);
+          if (swapResult == true) {
+            setTransationStep2('Successful');
+            clearInterval(intervalTransactionSatus);
+            return;
+          }
+        }, 10000);
+
+        // Perform the swap.
+        let sendMultiTras = await AppicActor.icpSwap(
+          Principal.fromText(sellToken),
+          Principal.fromText(buyToken),
+          sellTokenType,
+          buyTokenType,
+          BigNumber(amtSell).minus(fee).toNumber()
+        );
+
+        console.log(sendMultiTras);
+        return sendMultiTras;
+      }
+    } catch (error) {
+      console.log('Failed', error.message);
+      setTransationStep1('Failed');
+      setTransationStep2('Failed');
+      setTransactionStepFailure(error.message || 'Transaction failed');
     }
   }
 
@@ -923,10 +954,20 @@ function Swap(props) {
                 </svg>
               )}
             </div>
-            <p className="transactionDetail">{transactionStep2 == 'Failed' ? transactionStepFailure : 'Please wait until the swap is done.'}</p>
+            <p className="transactionDetail">
+              {transactionStep2 == 'Failed' ? transactionStepFailure : 'Please wait until the swap is done. It can take up to 2 miutes'}
+            </p>
           </div>
-
-          {/* <button className="viewPosition">View your Position</button> */}
+          {transactionStep1 == 'Successful' && transactionStep2 == 'Successful' && (
+            <button
+              className="viewPosition"
+              onClick={() => {
+                setActiveComponent('');
+              }}
+            >
+              View your Position
+            </button>
+          )}
         </div>
       </Modal>
     </>
