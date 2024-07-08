@@ -317,8 +317,8 @@ function Swap({ setActiveComponent }) {
   async function swapWithICPswap(sellToken, buyToken, sellTokenType, buyTokenType, amtSell) {
     try {
       // Get the amount of buyToken that can be obtained for amtSell of sellToken.
+      console.log(sellToken, buyToken, amtSell);
       let amountOut = await icpSwapAmountOut(sellToken, buyToken, amtSell);
-      console.log(sellToken, buyToken, sellTokenType, buyTokenType, amtSell);
       if (amountOut == 0) {
         setTransationStep1('Failed');
         setTransactionStepFailure('No liquidity Found');
