@@ -80,6 +80,7 @@ export const AppicMultiswapidlFactory = ({ IDL }) => {
     p2: IDL.Text,
     p3: IDL.Text,
     time: IDL.Int,
+    txStatus: IDL.Text,
   });
   return IDL.Service({
     _getTokenActorWithType: IDL.Func([IDL.Text, IDL.Text], [TokenActorVariable], ['query']),

@@ -32,6 +32,7 @@ async function icpSwapAmountOut(token0Address, token0Standard, token1Address, to
     if (poolResult.ok) {
       // Extract pool data and canister ID.
       const poolData = poolResult.ok;
+      console.log(new Principal(poolData.canisterId._arr).toString());
       let canID = new Principal(poolData.canisterId._arr).toString();
 
       // Get the swap pool canister actor.
