@@ -7,6 +7,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import LoadingComponent from '@/components/higerOrderComponents/loadingComponent';
 import Sidebar from '@/components/sidebar';
 import DCA from '@/components/dcaRoot';
+import Swap from '@/components/swap';
 export default function Home() {
   const dispatch = useDispatch();
   const [activeComponent, setActiveComponent] = useState('');
@@ -20,6 +21,7 @@ export default function Home() {
           <>
             {activeComponent == '' && <WalletTokens />}
             {activeComponent == 'DCA' && <DCA></DCA>}
+            {activeComponent == 'SWAP' && <Swap setActiveComponent={setActiveComponent}></Swap>}
           </>
         )}
       </main>

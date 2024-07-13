@@ -214,6 +214,7 @@ a {
 //components
 @import './styleComponents/sidebar.scss';
 @import './styleComponents/higherOrderComponents/titles.scss';
+@import './styleComponents/higherOrderComponents/countdown.scss';
 @import './styleComponents/wallet_connect_modal.scss';
 @import './styleComponents/wallet_tokens.scss';
 @import './styleComponents/supported_tokens.scss';
@@ -221,9 +222,11 @@ a {
 @import './styleComponents/total_balance.scss';
 @import './styleComponents/portfolio.scss';
 @import './styleComponents/higherOrderComponents/modal.scss';
-@import './styleComponents/DCAtransactionModal.scss';
+@import './styleComponents/transactionModal.scss';
+@import './styleComponents/addTokenModal.scss';
 @import './styleComponents/DCApositions.scss';
 @import './styleComponents/createDCA.scss';
+@import './styleComponents/swap.scss';
 //pages
 @import './pages/main.scss';
 @import './pages/dca.scss';

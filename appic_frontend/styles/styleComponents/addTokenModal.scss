@@ -1,0 +1,470 @@
+.addTokenModal {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  height: 100%;
+  .topSection {
+    display: grid;
+    grid-template-columns: 0.5fr 1fr 0.5fr;
+    width: 100%;
+    .backBTN {
+      background: none;
+      color: $light-primary;
+      cursor: pointer;
+
+      svg {
+        fill: none;
+        width: 16px;
+        height: 16px;
+      }
+    }
+    .closeBTN {
+      background: none;
+      color: $light-primary;
+      svg {
+        fill: none;
+        width: 16px;
+        height: 16px;
+      }
+    }
+    .title {
+      text-align: center;
+      font-weight: 700;
+      color: $light-primary;
+      font-size: 1.5rem;
+    }
+  }
+  .searchContainer {
+    margin-top: 1rem;
+    border: 1px solid $light-border;
+    width: 90%;
+    padding: 1rem;
+    display: flex;
+    align-items: center;
+    border-radius: $border-radius;
+    background-color: $light-box-bg;
+    gap: 1rem;
+    .searchIcon {
+      fill: $light-secondary;
+    }
+    input {
+      color: $light-primary;
+      font-size: 1.2rem;
+      background: none;
+      width: 100%;
+      outline: none;
+      &::placeholder {
+        color: $light-placeholder;
+        font-size: 1.2rem;
+      }
+    }
+  }
+  .seprator {
+    width: 100%;
+    height: 2px !important;
+    background-color: $light-border;
+    margin: 1rem 0;
+    margin-bottom: 2rem;
+  }
+  .tokens {
+    width: 90%;
+    display: flex;
+    flex-direction: column;
+    gap: 1.2rem;
+    overflow-y: scroll;
+
+    .token {
+      cursor: pointer;
+      display: flex;
+
+      gap: 1.2rem;
+      justify-content: space-between;
+      align-items: center;
+      background-color: $light-box-bg;
+      border-radius: $border-radius;
+      padding: 0.7rem 1.6rem;
+      .token_info {
+        display: flex;
+        align-items: center;
+        gap: 1.2rem;
+        .token_logo {
+          width: 40px;
+          height: 40px;
+          border-radius: 50%;
+          border: 1px solid rgba(0, 0, 0, 0.1);
+        }
+        .token_details {
+          .token_name {
+            color: $light-primary;
+            font-size: 1.2rem;
+          }
+          .token_symbol {
+            color: $light-secondary;
+            font-size: 1rem;
+          }
+        }
+      }
+
+      .token_balance {
+        font-size: 1.2rem;
+      }
+      .token_balanceAndPrice {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-end;
+        h3 {
+          font-size: 1.2rem;
+        }
+        p {
+          font-size: 1rem;
+        }
+      }
+      &.selected {
+        background-color: #e4e4e4;
+        cursor: auto;
+        .selectedBadge {
+          background-color: $light-secondary;
+          color: #fff;
+          padding: 0.3rem;
+          font-size: 1rem;
+          border-radius: $border-radius;
+        }
+      }
+    }
+    &::-webkit-scrollbar {
+      width: 10px;
+    }
+
+    &::-webkit-scrollbar-track {
+      background-color: #e4e4e4;
+      border-radius: 20px;
+    }
+
+    &::-webkit-scrollbar-thumb {
+      background-image: $default-gradientToBottom;
+      box-shadow: inset 2px 2px 5px 0 rgba(#fff, 0.5);
+      border-radius: 20px;
+    }
+  }
+
+  &.dark {
+    .topSection {
+      .backBTN {
+        color: $dark-primary;
+
+        svg {
+        }
+      }
+      .closeBTN {
+        color: $dark-primary;
+        svg {
+        }
+      }
+      .title {
+        color: $dark-primary;
+      }
+    }
+    .searchContainer {
+      border: 1px solid $dark-border;
+      border-radius: $border-radius;
+      background-color: $dark-box-bg;
+      .searchIcon {
+        fill: $dark-secondary;
+      }
+      input {
+        color: $dark-primary;
+        &::placeholder {
+          color: $dark-placeholder;
+        }
+      }
+    }
+    .seprator {
+      background-color: $dark-border;
+    }
+    .tokens {
+      .token {
+        background-color: $dark-box-bg;
+        border-radius: $border-radius;
+        .token_info {
+          .token_logo {
+            border: 1px solid rgba(0, 0, 0, 0.1);
+          }
+          .token_details {
+            .token_name {
+              color: $dark-primary;
+            }
+            .token_symbol {
+              color: $dark-secondary;
+            }
+          }
+        }
+
+        .token_balance {
+        }
+        .token_balanceAndPrice {
+          color: $dark-primary;
+          h3 {
+          }
+          p {
+          }
+        }
+        &.selected {
+          background-color: #26272b;
+          .selectedBadge {
+          }
+        }
+      }
+      &::-webkit-scrollbar {
+      }
+
+      &::-webkit-scrollbar-track {
+        background-color: #e4e4e4;
+      }
+
+      &::-webkit-scrollbar-thumb {
+        background-image: $default-gradientToBottom;
+        box-shadow: inset 2px 2px 5px 0 rgba(#fff, 0.5);
+      }
+    }
+  }
+}
+@media screen and (min-width: 1024px) {
+  .addTokenModal {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    height: 100%;
+    overflow-y: hidden;
+    .topSection {
+      display: grid;
+      grid-template-columns: 0.5fr 1fr 0.5fr;
+      width: 100%;
+      .backBTN {
+        background: none;
+        color: $light-primary;
+        cursor: pointer;
+
+        svg {
+          fill: none;
+          width: 20px;
+          height: 20px;
+        }
+      }
+      .closeBTN {
+        background: none;
+        cursor: pointer;
+        color: $light-primary;
+        svg {
+          fill: none;
+          width: 20px;
+          height: 20px;
+        }
+      }
+      .title {
+        text-align: center;
+        font-weight: 700;
+        color: $light-primary;
+        font-size: 1.7rem;
+      }
+    }
+    .searchContainer {
+      margin-top: 1rem;
+      border: 1px solid $light-border;
+      width: 90%;
+      padding: 1rem;
+      display: flex;
+      align-items: center;
+      border-radius: $border-radius;
+      background-color: $light-box-bg;
+      gap: 1rem;
+      .searchIcon {
+        width: 25px;
+        height: 25px;
+        fill: $light-secondary;
+      }
+      input {
+        color: $light-primary;
+        font-size: 1.5rem;
+        background: none;
+        width: 100%;
+        outline: none;
+        &::placeholder {
+          color: $light-placeholder;
+          font-size: 1.5rem;
+        }
+      }
+    }
+    .seprator {
+      width: 100%;
+      height: 2px !important;
+      background-color: $light-tertiary;
+      margin: 1rem 0;
+      margin-bottom: 2rem;
+    }
+    .tokens {
+      width: 90%;
+      display: flex;
+      flex-direction: column;
+      gap: 1.2rem;
+      overflow-y: scroll;
+
+      .token {
+        cursor: pointer;
+        display: flex;
+        gap: 1.2rem;
+        align-items: center;
+        justify-content: space-between;
+        background-color: $light-box-bg;
+        border-radius: $border-radius;
+        padding: 0.7rem 1.6rem;
+        .token_info {
+          display: flex;
+          align-items: center;
+          gap: 1.2rem;
+          .token_logo {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            border: 1px solid rgba(0, 0, 0, 0.1);
+          }
+          .token_details {
+            .token_name {
+              color: $light-primary;
+              font-size: 1.3rem;
+            }
+            .token_symbol {
+              color: $light-secondary;
+              font-size: 1.1rem;
+            }
+          }
+        }
+
+        .token_balance {
+          font-size: 1.3rem;
+        }
+        .token_balanceAndPrice {
+          display: flex;
+          flex-direction: column;
+          align-items: flex-end;
+          h3 {
+            font-size: 1.2rem;
+          }
+          p {
+            font-size: 1.1rem;
+            font-weight: 700;
+          }
+        }
+        &.selected {
+          background-color: #e4e4e4;
+          cursor: auto;
+          .selectedBadge {
+            background-color: $light-secondary;
+            color: #fff;
+            padding: 0.3rem;
+            font-size: 1rem;
+            border-radius: $border-radius;
+          }
+        }
+      }
+
+      &::-webkit-scrollbar {
+        width: 10px;
+      }
+
+      &::-webkit-scrollbar-track {
+        background-color: #e4e4e4;
+        border-radius: 20px;
+      }
+
+      &::-webkit-scrollbar-thumb {
+        background-image: $default-gradientToBottom;
+        box-shadow: inset 2px 2px 5px 0 rgba(#fff, 0.5);
+        border-radius: 20px;
+      }
+    }
+
+    &.dark {
+      .topSection {
+        .backBTN {
+          color: $dark-primary;
+
+          svg {
+            fill: none;
+          }
+        }
+        .closeBTN {
+          color: $dark-primary;
+          svg {
+          }
+        }
+        .title {
+          color: $dark-primary;
+        }
+      }
+      .searchContainer {
+        border: 1px solid $dark-border;
+
+        border-radius: $border-radius;
+        background-color: $dark-box-bg;
+        .searchIcon {
+          fill: $dark-secondary;
+        }
+        input {
+          color: $dark-primary;
+
+          &::placeholder {
+            color: $dark-placeholder;
+          }
+        }
+      }
+      .seprator {
+        background-color: $dark-tertiary;
+      }
+      .tokens {
+        .token {
+          background-color: $dark-box-bg;
+          border-radius: $border-radius;
+          .token_info {
+            .token_logo {
+              border: 1px solid rgba(0, 0, 0, 0.1);
+            }
+            .token_details {
+              .token_name {
+                color: $dark-primary;
+              }
+              .token_symbol {
+                color: $dark-secondary;
+              }
+            }
+          }
+
+          .token_balance {
+            color: $dark-primary;
+          }
+          .token_balanceAndPrice {
+            h3 {
+              color: $dark-primary;
+            }
+            p {
+              color: $dark-primary;
+            }
+          }
+        }
+
+        &::-webkit-scrollbar {
+        }
+
+        &::-webkit-scrollbar-track {
+          background-color: #e4e4e4;
+        }
+
+        &::-webkit-scrollbar-thumb {
+          background-image: $default-gradientToBottom;
+          box-shadow: inset 2px 2px 5px 0 rgba(#fff, 0.5);
+        }
+      }
+    }
+  }
+}

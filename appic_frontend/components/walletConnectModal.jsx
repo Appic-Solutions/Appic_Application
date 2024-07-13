@@ -19,6 +19,7 @@ import { useSupportedPairs } from '@/hooks/getSupportedPairs';
 import LoadingComponent from './higerOrderComponents/loadingComponent';
 import { useSupportedWallets } from '@/hooks/getSuppoortedWallets';
 import { useUserDcaPositions } from '@/hooks/getUserDCAPositions';
+import { useUserSwapHistory } from '@/hooks/getSwapHistory';
 
 function WalletConnectM() {
   const dispatch = useDispatch();
@@ -58,10 +59,13 @@ function WalletConnectM() {
   const { getTokensPricesError } = usePrices(allTokensList, icpPrice);
   // Fetch token balances and usd balance of each user
   const { principalAssetsError } = useBalances(isWalletConnected, principalID, accoundID, supportedTokens);
-  //  Fetch Supported pairs from Appic canister
+  //  Fetch Supported pairs from Appic canister for auto invest feature
   const { getSupportedPairsError } = useSupportedPairs(assets, supportedTokens);
   //  Get All user DCA positions
   const {} = useUserDcaPositions(principalID, supportedTokens);
+  // Get all users swap history
+  const { getUserSwapHistoryError } = useUserSwapHistory(principalID, supportedTokens);
+
   // TODO: Handle errors via a notification bar
   // Events
 

@@ -1,0 +1,557 @@
+@media screen and (min-width: 1024px) {
+  .swap {
+    //   background-color: #000;
+    width: 65%;
+    height: 50vh;
+    margin: auto;
+    .swap__container {
+      display: flex;
+      justify-content: center;
+      margin-top: 2rem;
+      gap: 2rem;
+      .swap__config {
+        border: 1px solid $light-border;
+        background-color: $light-box-bg;
+        border-radius: $border-radius;
+        padding: 3rem;
+        width: 65%;
+        .titleAndHistory {
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          margin: 0 0.5rem 2rem 0.5rem;
+
+          svg {
+            width: 20px;
+            height: 20px;
+            cursor: pointer;
+            fill: $light-primary;
+          }
+          .title {
+          }
+        }
+
+        .fromtoContainer {
+          display: grid;
+          grid-template-columns: 1fr 2rem 1fr;
+          align-items: center;
+          justify-content: space-between;
+          .tokenContainer {
+            &:hover {
+              background-color: #ebebeb;
+            }
+            border: 1px solid $light-border;
+
+            cursor: pointer;
+
+            background-color: $light-bg;
+            padding: 2rem;
+            width: 100%;
+            border-radius: $border-radius;
+            span {
+              font-size: 1.3rem;
+              font-weight: 600;
+            }
+            .token {
+              margin-top: 1rem;
+              display: flex;
+              align-items: center;
+              gap: 0.7rem;
+              img {
+                border-radius: 50%;
+                width: 45px;
+                height: 45px;
+              }
+              .tokenDetails {
+                display: flex;
+                flex-direction: column;
+                gap: 0.2rem;
+                h3 {
+                  font-size: 1.7rem;
+                }
+                p {
+                  font-size: 1.2rem;
+                }
+              }
+            }
+          }
+          .arrow {
+            border: 1px solid $light-primary;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 2rem;
+            height: 2rem;
+            svg {
+              fill: $light-primary;
+              width: 10px;
+              height: 10px;
+            }
+          }
+        }
+        .amountContainer {
+          border: 1px solid $light-border;
+          span {
+            font-size: 1.3rem;
+            font-weight: 600;
+          }
+          width: 100%;
+          margin-top: 2rem;
+          background-color: $light-bg;
+          border-radius: $border-radius;
+          padding: 2rem;
+          .details {
+            margin-top: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+          }
+          cursor: pointer;
+          .tokenLogo {
+            border-radius: 50%;
+            width: 45px;
+            height: 45px;
+          }
+          .inputdatacontainer {
+            display: grid;
+            width: 100%;
+            grid-template-columns: 1fr 0.5fr;
+            input {
+              width: 100%;
+              // height: 40px;
+              background-color: $light-bg;
+              font-size: 1.7rem;
+              font-weight: 700;
+              padding: 1rem 0;
+              outline: none;
+            }
+            input[type='number']::-webkit-outer-spin-button,
+            input[type='number']::-webkit-inner-spin-button {
+              -webkit-appearance: none;
+              margin: 0;
+            }
+
+            /* For Firefox */
+            input[type='number']::-moz-number-spinners {
+              -moz-appearance: none;
+            }
+            .buttonContainer {
+              // bo/rder: 1px solid #000;
+              display: flex;
+              justify-content: right;
+              align-items: center;
+              button {
+                font-size: 1rem;
+                background-color: $light-secondary;
+                color: #fff;
+                padding: 0.5rem 1rem;
+
+                border-radius: $border-radius;
+                font-weight: 800;
+                cursor: pointer;
+              }
+            }
+
+            .usdPrice {
+              color: #1b1b1bc4;
+              font-size: 1rem;
+            }
+
+            .balance {
+              color: #1b1b1bc4;
+              font-size: 1rem;
+              text-align: right;
+            }
+          }
+        }
+
+        .swap_btn {
+          background-color: $light-secondary;
+          color: #fff;
+          border-radius: $border-radius;
+          width: 100%;
+          text-align: center;
+          padding: 1rem;
+          margin-top: 2rem;
+          font-size: 1.6rem;
+          font-size: 600;
+          cursor: pointer;
+          &:disabled {
+            cursor: unset;
+            background-color: #8c6c91;
+          }
+
+          &.review {
+            border: 3px solid #c7c7c7;
+          }
+        }
+      }
+      .swap__history {
+        border: 1px solid $light-border;
+        background-color: $light-box-bg;
+        border-radius: $border-radius;
+        padding: 3rem;
+        width: 65%;
+        .titleAndHistory {
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          margin: 0 0.5rem 2rem 0.5rem;
+
+          svg {
+            width: 20px;
+            height: 20px;
+            cursor: pointer;
+            fill: $light-primary;
+          }
+          .title {
+          }
+        }
+        .historyContainer {
+          margin-top: 2rem;
+          .historyHeader {
+            display: grid;
+            grid-template-columns: 25% 25% 25% 25%;
+            justify-items: center;
+            font-size: 1.5rem;
+            border-bottom: 1px solid $light-border;
+            color: $light-secondary;
+            padding-bottom: 1rem;
+            font-weight: 600;
+          }
+          .historyBody {
+            display: grid;
+            grid-template-columns: 25% 25% 25% 25%;
+            justify-items: center;
+            align-items: center;
+            padding: 1rem;
+            border-bottom: 1px solid $light-border;
+
+            .token {
+              display: flex;
+              gap: 0.5rem;
+              align-items: center;
+
+              .tokenLogo {
+                width: 25px;
+                height: 25px;
+                border-radius: 50%;
+              }
+              .tokenSymbol {
+                font-size: 1.2rem;
+                font-weight: 500;
+              }
+            }
+            .time {
+              font-size: 1.2rem;
+              font-weight: 500;
+            }
+            .status {
+              font-size: 1.2rem;
+              font-weight: 500;
+            }
+          }
+        }
+      }
+      .swap__routes {
+        width: 35%;
+        background-color: $light-box-bg;
+        border-radius: $border-radius;
+        max-height: 50vh;
+        transition: all 0.2s ease-in;
+
+        width: 0vw;
+        overflow: hidden;
+        padding: 0;
+        border: none;
+
+        .swapAndTimer {
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          margin-bottom: 2rem;
+          .title {
+            // margin-left: 0.5rem;
+          }
+        }
+        .dexs {
+          .dex {
+            cursor: pointer;
+            margin-bottom: 1rem;
+            background-color: $light-bg;
+            border: 1px solid $light-border;
+            padding: 1rem;
+            border-radius: 20px;
+            .badges {
+              display: flex;
+              align-items: center;
+              gap: 1rem;
+            }
+            .badge {
+              margin-bottom: 1rem;
+              padding: 0.6rem 1rem;
+              background-color: $light-secondary;
+              border-radius: $border-radius;
+              color: #fff;
+              font-size: 1.2rem;
+              font-weight: 600;
+              width: fit-content;
+            }
+            .return__details {
+              display: flex;
+              align-items: center;
+              gap: 1rem;
+              img {
+                width: 45px;
+                height: 45px;
+                border-radius: 50%;
+              }
+              .returnDetails {
+                display: flex;
+                flex-direction: column;
+                gap: 0.5rem;
+                .amount {
+                  font-size: 1.4rem;
+                }
+                .dexAndusdPrice {
+                  display: flex;
+                  align-items: center;
+                  gap: 1rem;
+                  p {
+                    font-size: 1.1rem;
+                  }
+                  .dexDetails {
+                    display: flex;
+                    align-items: center;
+                    gap: 0.5rem;
+                    img {
+                      width: 15px;
+                      height: 15px;
+                      border-radius: 50%;
+                    }
+                    p {
+                      font-size: 1.1rem;
+                      color: $light-secondary;
+                      font-weight: 800;
+                    }
+                  }
+                }
+              }
+            }
+            &.selected {
+              background-color: #c7c7c7;
+              &:hover {
+                background-color: #c7c7c7;
+              }
+            }
+            &:hover {
+              background-color: #ebebeb;
+            }
+          }
+        }
+        &.active {
+          width: 35%;
+          overflow: auto;
+          padding: 3rem;
+          border: 1px solid $light-border;
+        }
+      }
+    }
+
+    &.dark {
+      .swap__container {
+        .swap__config {
+          border: 1px solid $dark-border;
+
+          .titleAndHistory {
+            svg {
+              fill: $dark-primary;
+            }
+            .title {
+              color: $dark-primary;
+            }
+          }
+          background-color: $dark-box-bg;
+          border-radius: $border-radius;
+          .fromtoContainer {
+            .tokenContainer {
+              &:hover {
+                background-color: #212029;
+              }
+              border: 1px solid $dark-border;
+
+              background-color: $dark-bg;
+              border-radius: $border-radius;
+              span {
+                color: $dark-primary;
+              }
+              .token {
+                img {
+                }
+                .tokenDetails {
+                  h3 {
+                    color: $dark-primary;
+                  }
+                  p {
+                    color: $dark-primary;
+                  }
+                }
+              }
+            }
+            .arrow {
+              border: 1px solid $dark-primary;
+
+              svg {
+                fill: $dark-primary;
+              }
+            }
+          }
+          .amountContainer {
+            border: 1px solid $dark-border;
+            span {
+              color: $dark-primary;
+            }
+
+            background-color: $dark-bg;
+            .details {
+            }
+            .tokenLogo {
+            }
+            .inputdatacontainer {
+              input {
+                color: $dark-primary;
+
+                background-color: $dark-bg;
+              }
+              input[type='number']::-webkit-outer-spin-button,
+              input[type='number']::-webkit-inner-spin-button {
+                -webkit-appearance: none;
+              }
+
+              /* For Firefox */
+              input[type='number']::-moz-number-spinners {
+                -moz-appearance: none;
+              }
+              .buttonContainer {
+                button {
+                  background-color: $dark-secondary;
+                  border-radius: $border-radius;
+                }
+              }
+
+              .usdPrice {
+                color: $dark-primary;
+              }
+
+              .balance {
+                color: $dark-primary;
+              }
+            }
+          }
+
+          .swap_btn {
+            background-color: $dark-secondary;
+            &:disabled {
+              cursor: unset;
+              background-color: #8c6c91;
+            }
+          }
+        }
+        .swap__history {
+          border: 1px solid $dark-border;
+          background-color: $dark-box-bg;
+          border-radius: $border-radius;
+
+          .titleAndHistory {
+            svg {
+              fill: $dark-primary;
+            }
+            .title {
+              color: $dark-primary;
+            }
+          }
+          .historyContainer {
+            .historyHeader {
+              border-bottom: 1px solid $dark-border;
+              color: $dark-secondary;
+            }
+            .historyBody {
+              border-bottom: 1px solid $dark-border;
+
+              .token {
+                .tokenLogo {
+                }
+                .tokenSymbol {
+                  color: $dark-primary;
+                }
+              }
+              .time {
+                color: $dark-primary;
+              }
+              .status {
+                color: $dark-primary;
+              }
+            }
+          }
+        }
+        .swap__routes {
+          background-color: $dark-box-bg;
+
+          .swapAndTimer {
+            .title {
+              color: $dark-primary;
+
+              // margin-left: 0.5rem;
+            }
+          }
+          .dexs {
+            .dex {
+              background-color: $dark-bg;
+              border: 1px solid $dark-border;
+              .badge {
+                background-color: $dark-secondary;
+              }
+              .return__details {
+                img {
+                }
+                .returnDetails {
+                  .amount {
+                    color: $dark-primary;
+                  }
+                  .dexAndusdPrice {
+                    p {
+                      color: $dark-primary;
+                    }
+                    .dexDetails {
+                      img {
+                      }
+                      p {
+                        color: $dark-secondary;
+                      }
+                    }
+                  }
+                }
+              }
+              &.selected {
+                color: $dark-primary;
+
+                background-color: #212029;
+                &:hover {
+                  background-color: #212029;
+                }
+              }
+              &:hover {
+                background-color: #212029;
+              }
+            }
+          }
+          &.active {
+            border: 1px solid $dark-border;
+          }
+        }
+      }
+    }
+  }
+}
+

@@ -12,6 +12,7 @@ import LoadingComponent from './higerOrderComponents/loadingComponent';
 import { Chart as ChartJS, CategoryScale, LinearScale, BarElement, Title as chartTitle, Tooltip, Legend, ArcElement } from 'chart.js';
 import { Doughnut } from 'react-chartjs-2';
 import BigNumber from 'bignumber.js';
+import { useBalances } from '@/hooks/getPrincipalBalances';
 
 // Chart config
 ChartJS.register(CategoryScale, ArcElement, LinearScale, BarElement, chartTitle, Tooltip, Legend);
@@ -58,6 +59,10 @@ function WalletTokens({ setEditMode }) {
   const assets = useSelector((state) => state.wallet.items.assets);
   const totalBalance = useSelector((state) => state.wallet.items.totalBalance);
   const loader = useSelector((state) => state.wallet.items.loader);
+  const supportedTokens = useSelector((state) => state.supportedTokens.tokens);
+
+  // Fetch token balances and usd balance of each user
+  const { principalAssetsError } = useBalances(isWalletConnected, principalID, accoundID, supportedTokens);
 
   const chartLiveData = {
     labels: assets.map((token) => token.symbol),
