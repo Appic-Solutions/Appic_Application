@@ -9,6 +9,7 @@ import { supportedTokensReducer } from './features/supportedTokensSlice';
 import { supportedPairsReducer } from './features/supportedPairs';
 import { supportedWalletsReducer } from './features/supportedWallets';
 import { userPositionsReducer } from './features/dcaPositions';
+import { swapHistoryReducer } from './features/swapHistory';
 
 export const store = configureStore({
   reducer: {
@@ -22,6 +23,7 @@ export const store = configureStore({
     supportedPairs: supportedPairsReducer,
     supportedWallets: supportedWalletsReducer,
     userPositionsReducer: userPositionsReducer,
+    swapHistory: swapHistoryReducer,
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({

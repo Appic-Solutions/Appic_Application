@@ -19,6 +19,7 @@ import { useSupportedPairs } from '@/hooks/getSupportedPairs';
 import LoadingComponent from './higerOrderComponents/loadingComponent';
 import { useSupportedWallets } from '@/hooks/getSuppoortedWallets';
 import { useUserDcaPositions } from '@/hooks/getUserDCAPositions';
+import { useUserSwapHistory } from '@/hooks/getSwapHistory';
 
 function WalletConnectM() {
   const dispatch = useDispatch();
@@ -62,6 +63,9 @@ function WalletConnectM() {
   const { getSupportedPairsError } = useSupportedPairs(assets, supportedTokens);
   //  Get All user DCA positions
   const {} = useUserDcaPositions(principalID, supportedTokens);
+  // Get all users swap history
+  const { getUserSwapHistoryError } = useUserSwapHistory(principalID, supportedTokens);
+
   // TODO: Handle errors via a notification bar
   // Events
 

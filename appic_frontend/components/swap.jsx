@@ -27,6 +27,8 @@ function Swap({ setActiveComponent }) {
   const [timeLeft, setTimeLeft] = useState(30);
   const [tokenContractToShow, setTokenContractToShow] = useState('');
   const [isComparisonActive, setIsComparisonActive] = useState(false);
+  const [isHistoryActive, setIsHistoryActive] = useState(false);
+
   const [swapData, setSwapData] = useState({
     sellToken: {
       id: '',
@@ -53,6 +55,7 @@ function Swap({ setActiveComponent }) {
   const totalBalance = useSelector((state) => state.wallet.items.totalBalance);
   const loader = useSelector((state) => state.wallet.items.loader);
   const supportedTokens = useSelector((state) => state.supportedTokens.tokens);
+  const swapHistory = useSelector((state) => state.swapHistory.history);
 
   //   Sort tokens for the buy modal
   const sortTokensByPrice = () => {
@@ -60,7 +63,6 @@ function Swap({ setActiveComponent }) {
   };
   //   Token moodals search
   function searchinput(tokens, query) {
-    console.log(tokens);
     // Convert the query to lowercase for case-insensitive search
     const lowercaseQuery = query.toLowerCase();
 
@@ -161,16 +163,14 @@ function Swap({ setActiveComponent }) {
   const handleSwap = async () => {
     // Validate selected tokens and check if routes are selected
     if (swapData.shouldReview == true || swapData.buyToken.symbol == 'ABC' || swapData.sellToken.symbol == 'XYZ' || swapData.swpaPairs.length == 0) {
-      console.log('please provide enough data');
       return;
     }
     // Validate slected Route
     let slectedRoute = swapData.swpaPairs.find((pair) => pair.selected == true);
     if (slectedRoute.amountOut <= 0) {
-      console.log('please selecte a route with liquidity');
       return;
     }
-    console.log(slectedRoute);
+
     clearInterval(intervalRef.current);
     setTimeLeft(0);
     setTransactionModal(true);
@@ -214,7 +214,6 @@ function Swap({ setActiveComponent }) {
    * await swapWithSonic('qbizb-wiaaa-aaaaq-aabwq-cai', 'ryjl3-tyaaa-aaaaa-aaaba-cai', 'ICRC1', 'ICRC2', '1000000000000');
    */
   async function swapWithSonic(sellToken, buyToken, sellTokenType, buyTokenType, amtSell) {
-    console.log(sellToken, buyToken, sellTokenType, buyTokenType, amtSell);
     try {
       // Get the amount of buyToken that can be obtained for amtSell of sellToken.
       let amountOut = await sonicSwapAmountOut(sellToken, buyToken, amtSell);
@@ -249,7 +248,6 @@ function Swap({ setActiveComponent }) {
             created_at_time: [],
             amount: BigNumber(amtSell).minus(fee).toNumber(),
           });
-          console.log(tx);
         } else if (sellTokenType === 'ICRC2') {
           // Create an actor for the sell token canister.
           let icrc2 = await artemisWalletAdapter.getCanisterActor(sellToken, icrcIdlFactory, false);
@@ -296,7 +294,6 @@ function Swap({ setActiveComponent }) {
         return sendMultiTras;
       }
     } catch (error) {
-      console.log('Failed', error.message);
       setTransationStep1('Failed');
       setTransationStep2('Failed');
       setTransactionStepFailure(error.message || 'Transaction failed');
@@ -317,7 +314,6 @@ function Swap({ setActiveComponent }) {
   async function swapWithICPswap(sellToken, buyToken, sellTokenType, buyTokenType, amtSell) {
     try {
       // Get the amount of buyToken that can be obtained for amtSell of sellToken.
-      console.log(sellToken, buyToken, amtSell);
       let amountOut = await icpSwapAmountOut(sellToken, sellTokenType, buyToken, buyTokenType, amtSell);
       if (amountOut == 0) {
         setTransationStep1('Failed');
@@ -333,7 +329,6 @@ function Swap({ setActiveComponent }) {
 
         // Get the sub-account for the caller.
         const subAccount = await AppicActor.getICRC1SubAccount(caller);
-        console.log('subAccount', subAccount);
 
         // Handle different sell token types.
         if (sellTokenType === 'ICRC1') {
@@ -397,11 +392,9 @@ function Swap({ setActiveComponent }) {
           BigNumber(amtSell).minus(fee).toNumber()
         );
 
-        console.log(sendMultiTras);
         return sendMultiTras;
       }
     } catch (error) {
-      console.log('Failed', error.message);
       setTransationStep1('Failed');
       setTransationStep2('Failed');
       setTransactionStepFailure(error.message || 'Transaction failed');
@@ -432,7 +425,6 @@ function Swap({ setActiveComponent }) {
 
       // Get the sub-account for the caller.
       const subAccount = await AppicActor.getICRC1SubAccount(caller);
-      console.log('subAccount', subAccount);
 
       // Handle different sell token types.
       if (sellTokenType === 'ICRC1') {
@@ -486,7 +478,6 @@ function Swap({ setActiveComponent }) {
         BigNumber(amtSell).minus(fee).toNumber()
       );
 
-      console.log(sendMultiTras);
       return sendMultiTras;
     }
   }
@@ -518,7 +509,6 @@ function Swap({ setActiveComponent }) {
 
       // Get the sub-account for the caller.
       const subAccount = await AppicActor.getICRC1SubAccount(caller);
-      console.log('subAccount', subAccount);
 
       // Handle different sell token types.
       if (sellTokenType === 'ICRC1') {
@@ -574,7 +564,6 @@ function Swap({ setActiveComponent }) {
         buyTokenType
       );
 
-      console.log(sendMultiTras);
       return sendMultiTras;
     }
   }
@@ -585,97 +574,158 @@ function Swap({ setActiveComponent }) {
         {loader && <LoadingComponent></LoadingComponent>}
         {!loader && (
           <div className="swap__container">
-            <div className="swap__config">
-              <h2 className="title">Swap</h2>
-              <div className="fromtoContainer">
-                <div
-                  onClick={() => {
-                    setTokenModal({ isActive: true, modalType: 'sell', tokens: assets });
-                  }}
-                  className="tokenContainer from"
-                >
-                  <span>From</span>
-                  <div className="token">
-                    <img src={swapData.sellToken.logo} alt="" />
-                    <div className="tokenDetails">
-                      <h3>{swapData.sellToken.symbol}</h3>
-                      <p>{swapData.sellToken.name}</p>
-                    </div>
-                  </div>
-                </div>
-                <div className="arrow">
-                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512" onClick={switchBuyAndSell}>
-                    <path d="M438.6 278.6c12.5-12.5 12.5-32.8 0-45.3l-160-160c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3L338.8 224 32 224c-17.7 0-32 14.3-32 32s14.3 32 32 32l306.7 0L233.4 393.4c-12.5 12.5-12.5 32.8 0 45.3s32.8 12.5 45.3 0l160-160z" />
-                  </svg>
-                </div>
-                <div
-                  onClick={() => {
-                    setTokenModal({ isActive: true, modalType: 'buy', tokens: sortTokensByPrice() });
-                  }}
-                  className="tokenContainer to"
-                >
-                  <span>To</span>
-                  <div className="token">
-                    <img src={swapData.buyToken.logo} alt="" />
-                    <div className="tokenDetails">
-                      <h3>{swapData.buyToken.symbol}</h3>
-                      <p>{swapData.buyToken.name}</p>
-                    </div>
-                  </div>
-                </div>
-              </div>
-              <div className="amountContainer">
-                <span>Amount</span>
-                <div className="details">
-                  <img src={swapData.sellToken.logo} className="tokenLogo" alt="" />
-
-                  <div className="inputdatacontainer">
-                    <input
-                      onChange={(e) => {
-                        setSwapData({ ...swapData, amountToSell: e.target.value, shouldReview: true });
+            {isHistoryActive ? (
+              <div className="swap__history">
+                <div className="titleAndHistory">
+                  <h2 className="title">History</h2>
+                  <abbr title="History">
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      onClick={() => {
+                        setIsComparisonActive(false);
                       }}
-                      value={swapData.amountToSell}
-                      type="number"
-                      placeholder="0"
-                    />
-                    <div className="buttonContainer">
-                      <button
-                        onClick={() => {
-                          setSwapData({
-                            ...swapData,
-                            amountToSell: applyDecimals(swapData.sellToken.balance, swapData.sellToken.decimals),
-                            shouldReview: true,
-                          });
-                        }}
-                      >
-                        Max
-                      </button>
-                    </div>
-                    <p className="usdPrice">${BigNumber(swapData.amountToSell).multipliedBy(swapData.sellToken.price).toNumber() || 0}</p>
-                    <span className="balance">
-                      available/ {formatSignificantNumber(applyDecimals(swapData.sellToken.balance, swapData.sellToken.decimals)) || 0}
-                    </span>
-                  </div>
+                      viewBox="0 0 448 512"
+                    >
+                      <path d="M438.6 150.6c12.5-12.5 12.5-32.8 0-45.3l-96-96c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3L338.7 96 32 96C14.3 96 0 110.3 0 128s14.3 32 32 32l306.7 0-41.4 41.4c-12.5 12.5-12.5 32.8 0 45.3s32.8 12.5 45.3 0l96-96zm-333.3 352c12.5 12.5 32.8 12.5 45.3 0s12.5-32.8 0-45.3L109.3 416 416 416c17.7 0 32-14.3 32-32s-14.3-32-32-32l-306.7 0 41.4-41.4c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0l-96 96c-12.5 12.5-12.5 32.8 0 45.3l96 96z" />
+                    </svg>
+                  </abbr>
+                </div>
+                <div className="historyContainer">
+                  <ul className="historyHeader">
+                    <li className="token">Sold</li>
+                    <li className="token">Bought</li>
+                    <li>Time</li>
+                    <li>Status</li>
+                  </ul>
+                  {swapHistory.map((history, index) => {
+                    return (
+                      <div key={index} className="historyBody">
+                        <div className="token sold">
+                          <img className="tokenLogo" src={history.tokenIn.logo} alt="" />
+                          <h3 className="tokenSymbol">
+                            {formatSignificantNumber(history.amountSold)} {history.tokenIn.symbol}
+                          </h3>
+                        </div>
+                        <div className="token bought">
+                          <img className="tokenLogo" src={history.tokenOut.logo} alt="" />
+                          <h3 className="tokenSymbol">
+                            {formatSignificantNumber(history.amountBought)} {history.tokenOut.symbol}
+                          </h3>
+                        </div>
+                        <div className="time">{history.transactionTime}</div>
+                        <div className="status">{history.txStatus}</div>
+                      </div>
+                    );
+                  })}
                 </div>
               </div>
-              <button
-                disabled={swapData.buyToken.symbol == 'ABC' || swapData.sellToken.symbol == 'XYZ'}
-                onClick={async () => {
-                  if (swapData.shouldReview) {
-                    setIsComparisonActive(true);
-                    setSwapData({ ...swapData, swpaPairs: [] });
-                    await getReturnAmount();
-                  } else {
-                    await handleSwap();
-                  }
-                }}
-                className={swapData.shouldReview ? 'swap_btn review' : 'swap_btn confirm'}
-              >
-                {(swapData.buyToken.symbol == 'ABC' || swapData.sellToken.symbol == 'XYZ') && 'Select tokens'}
-                {swapData.shouldReview && !(swapData.buyToken.symbol == 'ABC' || swapData.sellToken.symbol == 'XYZ') && 'Review Swap'}
-                {!swapData.shouldReview && !(swapData.buyToken.symbol == 'ABC' || swapData.sellToken.symbol == 'XYZ') && 'Start Swapping'}
-              </button>
-            </div>
+            ) : (
+              <div className="swap__config">
+                <div className="titleAndHistory">
+                  <h2 className="title">Swap</h2>
+                  <abbr title="History">
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      viewBox="0 0 384 512"
+                      onClick={() => {
+                        setIsHistoryActive(true);
+                      }}
+                    >
+                      <path d="M64 0C28.7 0 0 28.7 0 64V448c0 35.3 28.7 64 64 64H320c35.3 0 64-28.7 64-64V160H256c-17.7 0-32-14.3-32-32V0H64zM256 0V128H384L256 0zM112 256H272c8.8 0 16 7.2 16 16s-7.2 16-16 16H112c-8.8 0-16-7.2-16-16s7.2-16 16-16zm0 64H272c8.8 0 16 7.2 16 16s-7.2 16-16 16H112c-8.8 0-16-7.2-16-16s7.2-16 16-16zm0 64H272c8.8 0 16 7.2 16 16s-7.2 16-16 16H112c-8.8 0-16-7.2-16-16s7.2-16 16-16z" />
+                    </svg>
+                  </abbr>
+                </div>
+                <div className="fromtoContainer">
+                  <div
+                    onClick={() => {
+                      setTokenModal({ isActive: true, modalType: 'sell', tokens: assets });
+                    }}
+                    className="tokenContainer from"
+                  >
+                    <span>From</span>
+                    <div className="token">
+                      <img src={swapData.sellToken.logo} alt="" />
+                      <div className="tokenDetails">
+                        <h3>{swapData.sellToken.symbol}</h3>
+                        <p>{swapData.sellToken.name}</p>
+                      </div>
+                    </div>
+                  </div>
+                  <div className="arrow">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512" onClick={switchBuyAndSell}>
+                      <path d="M438.6 278.6c12.5-12.5 12.5-32.8 0-45.3l-160-160c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3L338.8 224 32 224c-17.7 0-32 14.3-32 32s14.3 32 32 32l306.7 0L233.4 393.4c-12.5 12.5-12.5 32.8 0 45.3s32.8 12.5 45.3 0l160-160z" />
+                    </svg>
+                  </div>
+                  <div
+                    onClick={() => {
+                      setTokenModal({ isActive: true, modalType: 'buy', tokens: sortTokensByPrice() });
+                    }}
+                    className="tokenContainer to"
+                  >
+                    <span>To</span>
+                    <div className="token">
+                      <img src={swapData.buyToken.logo} alt="" />
+                      <div className="tokenDetails">
+                        <h3>{swapData.buyToken.symbol}</h3>
+                        <p>{swapData.buyToken.name}</p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div className="amountContainer">
+                  <span>Amount</span>
+                  <div className="details">
+                    <img src={swapData.sellToken.logo} className="tokenLogo" alt="" />
+
+                    <div className="inputdatacontainer">
+                      <input
+                        onChange={(e) => {
+                          setSwapData({ ...swapData, amountToSell: e.target.value, shouldReview: true });
+                        }}
+                        value={swapData.amountToSell}
+                        type="number"
+                        placeholder="0"
+                      />
+                      <div className="buttonContainer">
+                        <button
+                          onClick={() => {
+                            setSwapData({
+                              ...swapData,
+                              amountToSell: applyDecimals(swapData.sellToken.balance, swapData.sellToken.decimals),
+                              shouldReview: true,
+                            });
+                          }}
+                        >
+                          Max
+                        </button>
+                      </div>
+                      <p className="usdPrice">${BigNumber(swapData.amountToSell).multipliedBy(swapData.sellToken.price).toNumber() || 0}</p>
+                      <span className="balance">
+                        available/ {formatSignificantNumber(applyDecimals(swapData.sellToken.balance, swapData.sellToken.decimals)) || 0}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+                <button
+                  disabled={swapData.buyToken.symbol == 'ABC' || swapData.sellToken.symbol == 'XYZ'}
+                  onClick={async () => {
+                    if (swapData.shouldReview) {
+                      setIsComparisonActive(true);
+                      setSwapData({ ...swapData, swpaPairs: [] });
+                      await getReturnAmount();
+                    } else {
+                      await handleSwap();
+                    }
+                  }}
+                  className={swapData.shouldReview ? 'swap_btn review' : 'swap_btn confirm'}
+                >
+                  {(swapData.buyToken.symbol == 'ABC' || swapData.sellToken.symbol == 'XYZ') && 'Select tokens'}
+                  {swapData.shouldReview && !(swapData.buyToken.symbol == 'ABC' || swapData.sellToken.symbol == 'XYZ') && 'Review Swap'}
+                  {!swapData.shouldReview && !(swapData.buyToken.symbol == 'ABC' || swapData.sellToken.symbol == 'XYZ') && 'Start Swapping'}
+                </button>
+              </div>
+            )}
+
             <div className={isComparisonActive ? 'swap__routes active' : 'swap__routes'}>
               <div className="swapAndTimer">
                 <h2 className="title">Select Route</h2>
@@ -863,7 +913,9 @@ function Swap({ setActiveComponent }) {
         <div className={darkModeClassnamegenerator('transactionModal')}>
           <div className="topSection">
             <button className="backBTN"></button>
-            <h3 className="title">Approve Transaction</h3>
+            <h3 className="title">
+              {transactionStep1 == 'Successful' && transactionStep2 == 'Successful' ? 'Transaction successful' : 'Approve Transaction'}
+            </h3>
 
             <button
               disabled={transactionStep1 == 'inProgress' || transactionStep2 == 'inProgress'}

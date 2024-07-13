@@ -15,10 +15,22 @@
         border-radius: $border-radius;
         padding: 3rem;
         width: 65%;
-        .title {
-          margin-bottom: 2rem;
-          margin-left: 0.5rem;
+        .titleAndHistory {
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          margin: 0 0.5rem 2rem 0.5rem;
+
+          svg {
+            width: 20px;
+            height: 20px;
+            cursor: pointer;
+            fill: $light-primary;
+          }
+          .title {
+          }
         }
+
         .fromtoContainer {
           display: grid;
           grid-template-columns: 1fr 2rem 1fr;
@@ -175,117 +187,190 @@
           }
         }
       }
-    }
-    .swap__routes {
-      width: 35%;
-      background-color: $light-box-bg;
-      border-radius: $border-radius;
-      max-height: 50vh;
-      transition: all 0.2s ease-in;
+      .swap__history {
+        border: 1px solid $light-border;
+        background-color: $light-box-bg;
+        border-radius: $border-radius;
+        padding: 3rem;
+        width: 65%;
+        .titleAndHistory {
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          margin: 0 0.5rem 2rem 0.5rem;
 
-      width: 0vw;
-      overflow: hidden;
-      padding: 0;
-      border: none;
+          svg {
+            width: 20px;
+            height: 20px;
+            cursor: pointer;
+            fill: $light-primary;
+          }
+          .title {
+          }
+        }
+        .historyContainer {
+          margin-top: 2rem;
+          .historyHeader {
+            display: grid;
+            grid-template-columns: 25% 25% 25% 25%;
+            justify-items: center;
+            font-size: 1.5rem;
+            border-bottom: 1px solid $light-border;
+            color: $light-secondary;
+            padding-bottom: 1rem;
+            font-weight: 600;
+          }
+          .historyBody {
+            display: grid;
+            grid-template-columns: 25% 25% 25% 25%;
+            justify-items: center;
+            align-items: center;
+            padding: 1rem;
+            border-bottom: 1px solid $light-border;
 
-      .swapAndTimer {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        margin-bottom: 2rem;
-        .title {
-          // margin-left: 0.5rem;
+            .token {
+              display: flex;
+              gap: 0.5rem;
+              align-items: center;
+
+              .tokenLogo {
+                width: 25px;
+                height: 25px;
+                border-radius: 50%;
+              }
+              .tokenSymbol {
+                font-size: 1.2rem;
+                font-weight: 500;
+              }
+            }
+            .time {
+              font-size: 1.2rem;
+              font-weight: 500;
+            }
+            .status {
+              font-size: 1.2rem;
+              font-weight: 500;
+            }
+          }
         }
       }
-      .dexs {
-        .dex {
-          cursor: pointer;
-          margin-bottom: 1rem;
-          background-color: $light-bg;
-          border: 1px solid $light-border;
-          padding: 1rem;
-          border-radius: 20px;
-          .badges {
-            display: flex;
-            align-items: center;
-            gap: 1rem;
+      .swap__routes {
+        width: 35%;
+        background-color: $light-box-bg;
+        border-radius: $border-radius;
+        max-height: 50vh;
+        transition: all 0.2s ease-in;
+
+        width: 0vw;
+        overflow: hidden;
+        padding: 0;
+        border: none;
+
+        .swapAndTimer {
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          margin-bottom: 2rem;
+          .title {
+            // margin-left: 0.5rem;
           }
-          .badge {
+        }
+        .dexs {
+          .dex {
+            cursor: pointer;
             margin-bottom: 1rem;
-            padding: 0.6rem 1rem;
-            background-color: $light-secondary;
-            border-radius: $border-radius;
-            color: #fff;
-            font-size: 1.2rem;
-            font-weight: 600;
-            width: fit-content;
-          }
-          .return__details {
-            display: flex;
-            align-items: center;
-            gap: 1rem;
-            img {
-              width: 45px;
-              height: 45px;
-              border-radius: 50%;
-            }
-            .returnDetails {
+            background-color: $light-bg;
+            border: 1px solid $light-border;
+            padding: 1rem;
+            border-radius: 20px;
+            .badges {
               display: flex;
-              flex-direction: column;
-              gap: 0.5rem;
-              .amount {
-                font-size: 1.4rem;
+              align-items: center;
+              gap: 1rem;
+            }
+            .badge {
+              margin-bottom: 1rem;
+              padding: 0.6rem 1rem;
+              background-color: $light-secondary;
+              border-radius: $border-radius;
+              color: #fff;
+              font-size: 1.2rem;
+              font-weight: 600;
+              width: fit-content;
+            }
+            .return__details {
+              display: flex;
+              align-items: center;
+              gap: 1rem;
+              img {
+                width: 45px;
+                height: 45px;
+                border-radius: 50%;
               }
-              .dexAndusdPrice {
+              .returnDetails {
                 display: flex;
-                align-items: center;
-                gap: 1rem;
-                p {
-                  font-size: 1.1rem;
+                flex-direction: column;
+                gap: 0.5rem;
+                .amount {
+                  font-size: 1.4rem;
                 }
-                .dexDetails {
+                .dexAndusdPrice {
                   display: flex;
                   align-items: center;
-                  gap: 0.5rem;
-                  img {
-                    width: 15px;
-                    height: 15px;
-                    border-radius: 50%;
-                  }
+                  gap: 1rem;
                   p {
                     font-size: 1.1rem;
-                    color: $light-secondary;
-                    font-weight: 800;
+                  }
+                  .dexDetails {
+                    display: flex;
+                    align-items: center;
+                    gap: 0.5rem;
+                    img {
+                      width: 15px;
+                      height: 15px;
+                      border-radius: 50%;
+                    }
+                    p {
+                      font-size: 1.1rem;
+                      color: $light-secondary;
+                      font-weight: 800;
+                    }
                   }
                 }
               }
             }
-          }
-          &.selected {
-            background-color: #c7c7c7;
-            &:hover {
+            &.selected {
               background-color: #c7c7c7;
+              &:hover {
+                background-color: #c7c7c7;
+              }
+            }
+            &:hover {
+              background-color: #ebebeb;
             }
           }
-          &:hover {
-            background-color: #ebebeb;
-          }
+        }
+        &.active {
+          width: 35%;
+          overflow: auto;
+          padding: 3rem;
+          border: 1px solid $light-border;
         }
       }
-      &.active {
-        width: 35%;
-        overflow: auto;
-        padding: 3rem;
-        border: 1px solid $light-border;
-      }
     }
+
     &.dark {
       .swap__container {
         .swap__config {
           border: 1px solid $dark-border;
 
-          .title {
-            color: $dark-primary;
+          .titleAndHistory {
+            svg {
+              fill: $dark-primary;
+            }
+            .title {
+              color: $dark-primary;
+            }
           }
           background-color: $dark-box-bg;
           border-radius: $border-radius;
@@ -370,6 +455,43 @@
             &:disabled {
               cursor: unset;
               background-color: #8c6c91;
+            }
+          }
+        }
+        .swap__history {
+          border: 1px solid $dark-border;
+          background-color: $dark-box-bg;
+          border-radius: $border-radius;
+
+          .titleAndHistory {
+            svg {
+              fill: $dark-primary;
+            }
+            .title {
+              color: $dark-primary;
+            }
+          }
+          .historyContainer {
+            .historyHeader {
+              border-bottom: 1px solid $dark-border;
+              color: $dark-secondary;
+            }
+            .historyBody {
+              border-bottom: 1px solid $dark-border;
+
+              .token {
+                .tokenLogo {
+                }
+                .tokenSymbol {
+                  color: $dark-primary;
+                }
+              }
+              .time {
+                color: $dark-primary;
+              }
+              .status {
+                color: $dark-primary;
+              }
             }
           }
         }
