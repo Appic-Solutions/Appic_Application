@@ -582,7 +582,7 @@ function Swap({ setActiveComponent }) {
                     <svg
                       xmlns="http://www.w3.org/2000/svg"
                       onClick={() => {
-                        setIsComparisonActive(false);
+                        setIsHistoryActive(false);
                       }}
                       viewBox="0 0 448 512"
                     >
@@ -592,14 +592,16 @@ function Swap({ setActiveComponent }) {
                 </div>
                 <div className="historyContainer">
                   <ul className="historyHeader">
+                    <li>Time</li>
                     <li className="token">Sold</li>
                     <li className="token">Bought</li>
-                    <li>Time</li>
                     <li>Status</li>
                   </ul>
                   {swapHistory.map((history, index) => {
                     return (
                       <div key={index} className="historyBody">
+                        <div className="time">{history.transactionTime}</div>
+
                         <div className="token sold">
                           <img className="tokenLogo" src={history.tokenIn.logo} alt="" />
                           <h3 className="tokenSymbol">
@@ -612,7 +614,6 @@ function Swap({ setActiveComponent }) {
                             {formatSignificantNumber(history.amountBought)} {history.tokenOut.symbol}
                           </h3>
                         </div>
-                        <div className="time">{history.transactionTime}</div>
                         <div className="status">{history.txStatus}</div>
                       </div>
                     );
