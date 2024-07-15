@@ -1018,7 +1018,7 @@ function Swap({ setActiveComponent }) {
                 setActiveComponent('');
               }}
             >
-              View your Position
+              View your Portfolio
             </button>
           )}
         </div>

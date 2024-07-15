@@ -1301,199 +1301,255 @@
     &.dark {
       .dcaBox {
         background-color: $dark-box-bg;
+        border-radius: $border-radius;
         border: 1px solid $dark-border;
-      }
-
-      .dcaBox {
-        background-color: $dark-box-bg;
-
-        .creationContainer {
-          .title {
-            color: $dark-primary !important;
-          }
-
-          .infoAndClearAll {
-            p {
-              color: $dark-primary !important;
-
-              span {
-                color: $dark-percentageUP !important;
-              }
-            }
-
-            button {
-              color: $dark-secondary !important;
-            }
-          }
-          .tokensContainer {
-          }
-
-          .buyToken {
-            .token {
-              background: $dark-bg !important;
-
-              .tokenInfo {
-                img {
-                }
-
-                h2 {
-                  color: $dark-primary !important;
-                }
-              }
-
-              .tokenPercentage {
-                input {
-                  color: $dark-primary !important;
-                }
-
-                input:focus {
-                  border: none;
-                }
-              }
-
-              .Percentage {
-                color: $dark-secondary !important;
-              }
-            }
-
-            svg {
-              fill: $dark-percentageDown !important;
-            }
-          }
-          .noToken {
-            p {
+        .flex {
+          .creationContainer {
+            .title {
               color: $dark-primary;
             }
-          }
 
-          .addTokenButton {
-            img {
+            .tokenSelectionTitle {
             }
-          }
-
-          .seprator {
-            background-color: $dark-tertiary !important;
-          }
-
-          .smallTitle {
-            color: $dark-tertiary !important;
-          }
-
-          .sellInput {
-            background-color: $dark-bg !important;
-            border: 1px solid $dark-secondary !important;
-
-            input {
-              color: $dark-primary !important;
-            }
-
-            input:focus {
-              // border: 1px solid $dark-secondary;
-            }
-
-            .inputSeprator {
-              background-color: $dark-tertiary !important;
-            }
-
-            .sellTokenInfo {
-              img {
+            .tokenSelection {
+              .tokenContainer {
+                background-color: $dark-bg;
+                cursor: pointer;
+                .emptyLogo {
+                  background-color: #e0e0e0;
+                }
+                .emtpyText {
+                  color: $dark-placeholder;
+                }
+                img {
+                }
+                h1 {
+                  color: $dark-primary;
+                }
+                h3 {
+                  color: $dark-primary;
+                }
+                svg {
+                  fill: $dark-secondary;
+                }
+              }
+              .sellContainer {
+              }
+              .right-arrow {
+                fill: $dark-primary;
               }
 
-              h3 {
-                color: $dark-primary !important;
-              }
-
-              svg {
-                fill: $dark-primary !important;
+              .buyContainer {
               }
             }
-          }
-
-          .cycle_container {
-            .cycle {
-              border: 1px solid $dark-secondary !important;
-              color: $dark-primary !important;
-            }
-
-            .cycle.active {
-              border: 1px solid $dark-secondary !important;
-              background-color: $dark-secondary !important;
-              color: $dark-primary !important;
-            }
-          }
-          //    .cycle_container {
-          //         .selected_cycle {
-          //             background-color: $dark-bg;
-          //             p {
-          //                 color: $dark-primary;
-          //             }
-          //         }
-          //         .options_container {
-          //             background-color: $dark-bg;
-          //             .option {
-          //                 color: $dark-primary;
-          //                 &:hover {
-          //                     background-color: $dark-tertiary;
-          //                 }
-          //             }
-          //         }
-          //     }
-
-          .monthDate {
-            h4 {
-              color: $dark-primary !important;
-            }
-
-            .localTimeInputs {
-              background-color: $dark-bg !important;
-
-              input {
-                color: $dark-primary !important;
+            .repetitionAndAmountContainer {
+              .inputGroup {
+                h4 {
+                  color: $dark-primary;
+                }
+                input {
+                  background: $dark-bg;
+                  color: $dark-primary;
+                }
+              }
+              .repetition {
+                .inputAndPriceContainer {
+                  input {
+                    color: $dark-primary;
+                  }
+                  .price {
+                    color: $dark-secondary;
+                  }
+                }
+              }
+              .amount {
               }
             }
-          }
 
-          .weekdays {
-            .weekday {
-              border: 1px solid $dark-secondary !important;
-              color: $dark-primary !important;
+            .seprator {
+              background-color: $dark-tertiary;
             }
 
-            .weekday.active {
-              border: 1px solid $dark-secondary !important;
-              background-color: $dark-secondary !important;
-              color: $dark-primary !important;
-            }
-          }
-
-          .localTime {
-            h4 {
-              color: $dark-primary !important;
+            .smallTitle {
+              color: $dark-primary;
             }
 
-            .localTimeInputs {
-              background-color: $dark-bg !important;
+            .cycle_container {
+              .cycle {
+                // margin-bottom: 1rem;
+                border: 1px solid $dark-secondary;
 
-              .localTime_seprator {
-              }
-
-              input {
-                color: $dark-primary !important;
-              }
-            }
-          }
-
-          .smallTimeLine {
-            color: $dark-primary !important;
-          }
-
-          .reviewBTN {
-          }
-          .reviewDca {
-            .logoContainer {
-              p {
                 color: $dark-primary;
               }
+
+              .cycle.active {
+                border: 1px solid $dark-secondary;
+                background-color: $dark-secondary;
+                color: $dark-box-bg;
+              }
+            }
+
+            .monthDate {
+              h4 {
+                color: $dark-primary;
+              }
+
+              .localTimeInputs {
+                background-color: $dark-bg;
+
+                input {
+                  color: $dark-primary;
+                }
+              }
+            }
+
+            .weekdays {
+              .weekday {
+                border: 1px solid $dark-secondary;
+              }
+
+              .weekday.active {
+                border: 1px solid $dark-secondary;
+                background-color: $dark-secondary;
+                color: $dark-box-bg;
+              }
+            }
+
+            .localTime {
+              .localTimeTitle {
+                color: $dark-primary;
+                text-decoration: underline dotted 2px $dark-secondary;
+              }
+              .localTimeTitle:hover::after {
+                background-color: $dark-bg;
+              }
+
+              .localTimeInputs {
+                background-color: $dark-bg;
+
+                .localTime_seprator {
+                  color: $dark-primary;
+                }
+
+                input {
+                  color: $dark-primary;
+                }
+              }
+            }
+
+            .createPosition {
+              &.mobile {
+              }
+              &.desktop {
+              }
+            }
+          }
+          .reviewDCA {
+            .title {
+              color: $dark-primary;
+            }
+            .details {
+              .detailsContainer {
+                .detail {
+                  background: none;
+                  border-radius: 0;
+                  border-bottom: 1px solid $dark-border;
+                  .titleContainer {
+                    .dot {
+                      background-color: $dark-secondary;
+                    }
+                    h1 {
+                      color: $dark-primary;
+                    }
+                  }
+                  h1 {
+                    color: $dark-secondary;
+                    span.skeleton {
+                      color: $dark-skeleton;
+                    }
+                  }
+                }
+              }
+              .explanation {
+                color: $dark-primary;
+                span {
+                  span.skeleton {
+                    color: $dark-skeleton;
+                  }
+                  color: $dark-secondary;
+                }
+              }
+            }
+            .timeline {
+              .timelineContainer {
+                &::-webkit-scrollbar {
+                }
+
+                &::-webkit-scrollbar-track {
+                  background-color: #e4e4e4;
+                }
+
+                &::-webkit-scrollbar-thumb {
+                  background-image: $default-gradientToBottom;
+                }
+                .timelineHolder {
+                  position: relative;
+
+                  .timelineShape {
+                    background-color: $dark-secondary;
+                    &.skeleton {
+                      background-color: $dark-skeleton;
+                    }
+                  }
+                  .swapTime {
+                    .connectedTitle {
+                      .connector {
+                        background-color: $dark-secondary;
+                      }
+                      h3 {
+                        color: $dark-primary;
+                      }
+                    }
+                    h2 {
+                    }
+                    &.last {
+                      .tailCover {
+                        background-color: #111520;
+                      }
+                      .connectedTitle {
+                        .connector {
+                        }
+                        h1 {
+                        }
+                      }
+                    }
+                    &.first {
+                      .tailCover {
+                        background-color: #111520;
+                      }
+                      .connectedTitle {
+                        .connector {
+                        }
+                        h1 {
+                        }
+                      }
+                    }
+                    &.skeleton {
+                      .connector {
+                        background-color: $dark-skeleton;
+                      }
+                      h3 {
+                        color: $dark-skeleton;
+                      }
+                      h2 {
+                        color: $dark-skeleton;
+                      }
+                    }
+                  }
+                }
+              }
+            }
+            &.desktop {
             }
           }
         }

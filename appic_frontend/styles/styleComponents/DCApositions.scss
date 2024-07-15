@@ -553,6 +553,88 @@
         }
       }
     }
+
+    &.dark {
+      .topSection {
+        .backBTN {
+          color: $dark-primary;
+
+          svg {
+          }
+        }
+        .closeBTN {
+          color: $dark-primary;
+          svg {
+          }
+        }
+        .title {
+          color: $dark-primary;
+        }
+      }
+
+      .seprator {
+        background-color: $dark-tertiary;
+      }
+      .timelineContainer {
+        overflow-y: scroll;
+        &::-webkit-scrollbar {
+        }
+
+        &::-webkit-scrollbar-track {
+          background-color: #e4e4e4;
+        }
+
+        &::-webkit-scrollbar-thumb {
+        }
+        .timelineHolder {
+          .timelineShape {
+            background-color: $dark-secondary;
+            &.skeleton {
+              background-color: $dark-skeleton;
+            }
+          }
+          .swapTime {
+            .connectedTitle {
+              .connector {
+                background-color: $dark-secondary;
+              }
+              .transactionIndex {
+                color: $dark-secondary;
+              }
+            }
+
+            .transactionDetail {
+              color: $dark-primary;
+              span {
+                color: $dark-secondary;
+              }
+            }
+            &.last {
+              .tailCover {
+                background-color: $dark-bg;
+              }
+              .connectedTitle {
+                .connector {
+                }
+                h1 {
+                }
+              }
+            }
+            &.first {
+              .tailCover {
+                background-color: $dark-bg;
+              }
+              .connectedTitle {
+                .connector {
+                }
+                h1 {
+                }
+              }
+            }
+          }
+        }
+      }
+    }
   }
 }
 

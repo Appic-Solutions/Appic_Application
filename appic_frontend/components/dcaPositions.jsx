@@ -120,7 +120,6 @@ export default function DcaPositions({ positionStatus }) {
                 <li>Amount per swap</li>
                 <li>Executed</li>
                 <li>TimeLine</li>
-                <li></li>
               </ul>
               {completedPositions.map((position, index) => {
                 let amountPerSwap = 0;
@@ -165,9 +164,6 @@ export default function DcaPositions({ positionStatus }) {
                           <path d="M64 0C28.7 0 0 28.7 0 64V448c0 35.3 28.7 64 64 64H320c35.3 0 64-28.7 64-64V160H256c-17.7 0-32-14.3-32-32V0H64zM256 0V128H384L256 0zM112 256H272c8.8 0 16 7.2 16 16s-7.2 16-16 16H112c-8.8 0-16-7.2-16-16s7.2-16 16-16zm0 64H272c8.8 0 16 7.2 16 16s-7.2 16-16 16H112c-8.8 0-16-7.2-16-16s7.2-16 16-16zm0 64H272c8.8 0 16 7.2 16 16s-7.2 16-16 16H112c-8.8 0-16-7.2-16-16s7.2-16 16-16z" />
                         </svg>
                       </div>
-                      <div className="DeleteBTN">
-                        <button>Delete Position</button>
-                      </div>
                     </div>
                   </div>
                 );
@@ -178,7 +174,7 @@ export default function DcaPositions({ positionStatus }) {
       )}
 
       <Modal active={timeLineModal.isActive}>
-        <div className="timelineModal">
+        <div className={darkModeClassnamegenerator('timelineModal')}>
           <div className="topSection">
             <button className="backBTN"></button>
             <h3 className="title">Position Timeline</h3>
