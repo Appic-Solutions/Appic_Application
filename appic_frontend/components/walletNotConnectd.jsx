@@ -23,7 +23,7 @@ function WalletNotConnected() {
 
       <h2> Wallet Not Connected</h2>
 
-      <p>Connect your wallet to start creating Auto Invest positions!</p>
+      <p>Connect your wallet to start managing your financial portfolio!</p>
       <div className="buttonsContainer">
         <button
           onClick={() => {

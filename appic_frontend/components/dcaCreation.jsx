@@ -949,7 +949,7 @@ export default function DcaCreation({ setPositionStatus }) {
 
       {/* Transaction Modal */}
       <Modal active={transactionModal}>
-        <div className="transactionModal">
+        <div className={darkModeClassnamegenerator('transactionModal')}>
           <div className="topSection">
             <button className="backBTN"></button>
             <h3 className="title">Approve transaction</h3>
