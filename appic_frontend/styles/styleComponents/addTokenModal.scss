@@ -1,4 +1,7 @@
 .addTokenModal {
+  .noToken {
+    text-align: center;
+  }
   width: 100%;
   display: flex;
   flex-direction: column;
@@ -149,6 +152,10 @@
   }
 
   &.dark {
+    .noToken {
+      text-align: center;
+      color: $dark-primary;
+    }
     .topSection {
       .backBTN {
         color: $dark-primary;
@@ -468,3 +475,4 @@
     }
   }
 }
+

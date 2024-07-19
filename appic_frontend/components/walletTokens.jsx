@@ -97,7 +97,8 @@ function WalletTokens({ setEditMode }) {
         <>
           <div className="wallet__tokens">
             {loader && <LoadingComponent></LoadingComponent>}
-            {!loader && (
+            {!loader && assets.length == 0 && <h2 className="noToken">No tokens were found in your wallet</h2>}
+            {!loader && assets.length != 0 && (
               <>
                 <div className="chart">
                   <Doughnut options={options} data={chartLiveData}></Doughnut>

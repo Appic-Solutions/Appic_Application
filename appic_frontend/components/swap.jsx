@@ -713,7 +713,14 @@ function Swap({ setActiveComponent }) {
                   </div>
                 </div>
                 <button
-                  disabled={swapData.buyToken.symbol == 'ABC' || swapData.sellToken.symbol == 'XYZ'}
+                  disabled={
+                    swapData.buyToken.symbol == 'ABC' ||
+                    swapData.sellToken.symbol == 'XYZ' ||
+                    BigNumber(swapData.sellToken.balance).toNumber() <
+                      BigNumber(swapData.amountToSell)
+                        .multipliedBy(10 ** swapData.sellToken.decimals)
+                        .toNumber()
+                  }
                   onClick={async () => {
                     if (swapData.shouldReview) {
                       setIsComparisonActive(true);
@@ -725,9 +732,36 @@ function Swap({ setActiveComponent }) {
                   }}
                   className={swapData.shouldReview ? 'swap_btn review' : 'swap_btn confirm'}
                 >
+                  {/* show Select token in the button  */}
                   {(swapData.buyToken.symbol == 'ABC' || swapData.sellToken.symbol == 'XYZ') && 'Select tokens'}
-                  {swapData.shouldReview && !(swapData.buyToken.symbol == 'ABC' || swapData.sellToken.symbol == 'XYZ') && 'Review Swap'}
-                  {!swapData.shouldReview && !(swapData.buyToken.symbol == 'ABC' || swapData.sellToken.symbol == 'XYZ') && 'Start Swapping'}
+
+                  {/* show Not enough funds in the button  */}
+                  {BigNumber(swapData.sellToken.balance).toNumber() <
+                    BigNumber(swapData.amountToSell)
+                      .multipliedBy(10 ** swapData.sellToken.decimals)
+                      .toNumber() && 'Not Enough Funds'}
+
+                  {/* show Review Swap in the button  */}
+                  {!(
+                    BigNumber(swapData.sellToken.balance).toNumber() <
+                    BigNumber(swapData.amountToSell)
+                      .multipliedBy(10 ** swapData.sellToken.decimals)
+                      .toNumber()
+                  ) &&
+                    swapData.shouldReview &&
+                    !(swapData.buyToken.symbol == 'ABC' || swapData.sellToken.symbol == 'XYZ') &&
+                    'Review Swap'}
+
+                  {/* show Start Swapping in the button  */}
+                  {!swapData.shouldReview &&
+                    !(swapData.buyToken.symbol == 'ABC' || swapData.sellToken.symbol == 'XYZ') &&
+                    !(
+                      BigNumber(swapData.sellToken.balance).toNumber() <
+                      BigNumber(swapData.amountToSell)
+                        .multipliedBy(10 ** swapData.sellToken.decimals)
+                        .toNumber()
+                    ) &&
+                    'Start Swapping'}
                 </button>
               </div>
             )}
@@ -834,6 +868,9 @@ function Swap({ setActiveComponent }) {
           <div className="seprator">
             <span></span>
           </div>
+
+          {!loader && assets.length == 0 && <h2 className="noToken">No tokens were found in your wallet</h2>}
+
           <div className="tokens">
             {tokenModal.tokens?.map((token) => {
               return (
@@ -1118,7 +1155,14 @@ function Swap({ setActiveComponent }) {
           {swapData.swpaPairs != 0 && (
             <div className="btnContianer">
               <button
-                disabled={swapData.buyToken.symbol == 'ABC' || swapData.sellToken.symbol == 'XYZ'}
+                disabled={
+                  swapData.buyToken.symbol == 'ABC' ||
+                  swapData.sellToken.symbol == 'XYZ' ||
+                  BigNumber(swapData.sellToken.balance).toNumber() <
+                    BigNumber(swapData.amountToSell)
+                      .multipliedBy(10 ** swapData.sellToken.decimals)
+                      .toNumber()
+                }
                 onClick={async () => {
                   if (swapData.shouldReview) {
                     setIsComparisonActive(true);
@@ -1130,9 +1174,36 @@ function Swap({ setActiveComponent }) {
                 }}
                 className={swapData.shouldReview ? 'swap_btn review' : 'swap_btn confirm'}
               >
+                {/* show Select token in the button  */}
                 {(swapData.buyToken.symbol == 'ABC' || swapData.sellToken.symbol == 'XYZ') && 'Select tokens'}
-                {swapData.shouldReview && !(swapData.buyToken.symbol == 'ABC' || swapData.sellToken.symbol == 'XYZ') && 'Review Swap'}
-                {!swapData.shouldReview && !(swapData.buyToken.symbol == 'ABC' || swapData.sellToken.symbol == 'XYZ') && 'Start Swapping'}
+
+                {/* show Not enough funds in the button  */}
+                {BigNumber(swapData.sellToken.balance).toNumber() <
+                  BigNumber(swapData.amountToSell)
+                    .multipliedBy(10 ** swapData.sellToken.decimals)
+                    .toNumber() && 'Not Enough Funds'}
+
+                {/* show Review Swap in the button  */}
+                {!(
+                  BigNumber(swapData.sellToken.balance).toNumber() <
+                  BigNumber(swapData.amountToSell)
+                    .multipliedBy(10 ** swapData.sellToken.decimals)
+                    .toNumber()
+                ) &&
+                  swapData.shouldReview &&
+                  !(swapData.buyToken.symbol == 'ABC' || swapData.sellToken.symbol == 'XYZ') &&
+                  'Review Swap'}
+
+                {/* show Start Swapping in the button  */}
+                {!swapData.shouldReview &&
+                  !(swapData.buyToken.symbol == 'ABC' || swapData.sellToken.symbol == 'XYZ') &&
+                  !(
+                    BigNumber(swapData.sellToken.balance).toNumber() <
+                    BigNumber(swapData.amountToSell)
+                      .multipliedBy(10 ** swapData.sellToken.decimals)
+                      .toNumber()
+                  ) &&
+                  'Start Swapping'}
               </button>
             </div>
           )}

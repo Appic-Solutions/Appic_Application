@@ -1,4 +1,7 @@
 .walletTokens {
+  .noToken {
+    text-align: center;
+  }
   .wallet__totlaBalance {
     display: flex;
     gap: 1.5rem;
@@ -167,6 +170,10 @@
     padding: 0 1.5rem;
   }
   &.dark {
+    .noToken {
+      text-align: center;
+      color: $dark-primary;
+    }
     .wallet__totlaBalance {
       .balance__title {
         color: #9a9cb8;
