@@ -21,10 +21,13 @@ function Swap({ setActiveComponent }) {
   const [transactionStep1, setTransationStep1] = useState('notTriggered'); // inProgress, notTriggered, Rejected, Fialed , Successful
   const [transactionStep2, setTransationStep2] = useState('notTriggered'); // inProgress, notTriggered, Rejected, Fialeds
   const [transactionStepFailure, setTransactionStepFailure] = useState(null);
+
   const intervalRef = useRef(null);
 
   const intervalTransactionSatus = useRef(null);
   const [timeLeft, setTimeLeft] = useState(30);
+  const [mobileTimeLeft, setMobileTimeLeft] = useState(30);
+
   const [tokenContractToShow, setTokenContractToShow] = useState('');
   const [isComparisonActive, setIsComparisonActive] = useState(false);
   const [isHistoryActive, setIsHistoryActive] = useState(false);
@@ -143,6 +146,7 @@ function Swap({ setActiveComponent }) {
 
     setSwapData({ ...swapData, swpaPairs: dexsObject, shouldReview: false });
     setTimeLeft(30);
+    setMobileTimeLeft(30);
   };
 
   // Hook for updating the pairs after everychange
@@ -173,6 +177,7 @@ function Swap({ setActiveComponent }) {
 
     clearInterval(intervalRef.current);
     setTimeLeft(0);
+    setMobileTimeLeft(0);
     setTransactionModal(true);
     setTransationStep1('inProgress');
     switch (slectedRoute.dex) {
@@ -1020,6 +1025,116 @@ function Swap({ setActiveComponent }) {
             >
               View your Portfolio
             </button>
+          )}
+        </div>
+      </Modal>
+
+      {/* Review Swap Modal Mobile*/}
+      <Modal active={isComparisonActive} forMobile={true}>
+        <div className={darkModeClassnamegenerator('swap__routes__mobile')}>
+          <div className="topSection">
+            <button className="backBTN"></button>
+            <h3 className="title">Review Swap</h3>
+
+            <button
+              onClick={() => {
+                setIsComparisonActive(false);
+                setSwapData({ ...swapData, shouldReview: true });
+              }}
+              className="closeBTN"
+            >
+              <svg fill="none" viewBox="0 0 16 16">
+                <path
+                  fill="currentColor"
+                  fillRule="evenodd"
+                  d="M2.54 2.54a1 1 0 0 1 1.42 0L8 6.6l4.04-4.05a1 1 0 1 1 1.42 1.42L9.4 8l4.05 4.04a1 1 0 0 1-1.42 1.42L8 9.4l-4.04 4.05a1 1 0 0 1-1.42-1.42L6.6 8 2.54 3.96a1 1 0 0 1 0-1.42Z"
+                  clipRule="evenodd"
+                ></path>
+              </svg>
+            </button>
+          </div>
+          <div className="seprator">
+            <span></span>
+          </div>
+          <div className="swapAndTimer">
+            <h2 className="title">Select Route</h2>
+            {/* <Countdown
+              timeLeft={mobileTimeLeft}
+              setTimeLeft={setMobileTimeLeft}
+              onCountdownComplete={async () => {
+                setSwapData({ ...swapData, swpaPairs: [] });
+                await getReturnAmount();
+              }}
+              intervalRef={intervalRef}
+            /> */}
+          </div>
+
+          <div className="dexs">
+            {swapData.swpaPairs == 0 && <LoadingComponent></LoadingComponent>}
+            {swapData.swpaPairs.map((pair, index) => {
+              return (
+                <div
+                  key={pair.dex}
+                  onClick={() => {
+                    let newPairsObject = swapData.swpaPairs.map((pair) => {
+                      pair.selected = false;
+                      return pair;
+                    });
+
+                    newPairsObject[index].selected = true;
+                    setSwapData({ ...swapData, swpaPairs: newPairsObject });
+                  }}
+                  className={pair.selected ? 'dex selected' : 'dex'}
+                >
+                  <div className="badges">
+                    {pair.amountOut == 0 ? (
+                      <p className="badge">No liquidity Available</p>
+                    ) : (
+                      <>
+                        {index == 0 && <p className="badge">Best Return</p>}
+                        {pair.selected && <p className="badge">Selected</p>}
+                      </>
+                    )}
+                  </div>
+                  <div className="return__details">
+                    <img src={swapData.buyToken.logo} alt="" />
+                    <div className="returnDetails">
+                      <h3 className="amount">
+                        ~{formatSignificantNumber(pair.amountOut)} {swapData.buyToken.symbol}
+                      </h3>
+                      <div className="dexAndusdPrice">
+                        <p>$~{formatDecimalValue(pair.usdValue)}</p>
+                        <div className="dexDetails">
+                          <img src={getDexLogo(pair.dex)} alt="" />
+                          <p>{pair.dex}</p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+          {swapData.swpaPairs != 0 && (
+            <div className="btnContianer">
+              <button
+                disabled={swapData.buyToken.symbol == 'ABC' || swapData.sellToken.symbol == 'XYZ'}
+                onClick={async () => {
+                  if (swapData.shouldReview) {
+                    setIsComparisonActive(true);
+                    setSwapData({ ...swapData, swpaPairs: [] });
+                    await getReturnAmount();
+                  } else {
+                    await handleSwap();
+                  }
+                }}
+                className={swapData.shouldReview ? 'swap_btn review' : 'swap_btn confirm'}
+              >
+                {(swapData.buyToken.symbol == 'ABC' || swapData.sellToken.symbol == 'XYZ') && 'Select tokens'}
+                {swapData.shouldReview && !(swapData.buyToken.symbol == 'ABC' || swapData.sellToken.symbol == 'XYZ') && 'Review Swap'}
+                {!swapData.shouldReview && !(swapData.buyToken.symbol == 'ABC' || swapData.sellToken.symbol == 'XYZ') && 'Start Swapping'}
+              </button>
+            </div>
           )}
         </div>
       </Modal>
