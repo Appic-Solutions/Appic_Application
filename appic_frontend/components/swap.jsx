@@ -1050,7 +1050,7 @@ function Swap({ setActiveComponent }) {
               )}
             </div>
             <p className="transactionDetail">
-              {transactionStep2 == 'Failed' ? transactionStepFailure : 'Please wait until the swap is done. It can take up to 2 miutes'}
+              {transactionStep2 == 'Failed' ? transactionStepFailure : 'Please wait until the swap is done. It can take up to 2 minutes'}
             </p>
           </div>
           {transactionStep1 == 'Successful' && transactionStep2 == 'Successful' && (
